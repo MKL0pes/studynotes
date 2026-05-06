@@ -36,11 +36,11 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="mt-2 flex-1 space-y-0.5 overflow-y-auto px-3">
         {notebooks.map((nb) => {
-          const active = path.startsWith(`/notebook/${nb.id}`);
+          const active = path.includes(`/notebook/${nb.id}`);
           return (
             <Link
               key={nb.id}
-              to="/notebook/$id"
+              to="/_authenticated/notebook/$id"
               params={{ id: nb.id }}
               onClick={onNavigate}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${

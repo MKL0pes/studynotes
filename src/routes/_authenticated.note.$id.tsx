@@ -22,7 +22,7 @@ function NotePage() {
   return (
     <AppShell
       middle={<NotesList title={`${notebook.emoji}  ${notebook.name}`} notes={siblings} />}
-      right={<NoteEditor note={note} backTo={{ to: "/notebook/$id", params: { id: notebook.id } }} />}
+      right={<NoteEditor note={note} backTo={{ to: "/_authenticated/notebook/$id", params: { id: notebook.id } }} />}
     />
   );
 }
