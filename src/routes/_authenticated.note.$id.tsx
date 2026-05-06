@@ -4,7 +4,7 @@ import { NotesList } from "@/components/notes-list";
 import { NoteEditor } from "@/components/note-editor";
 import { getNote, getNotebook, getNotesByNotebook } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/note/$id")({
+export const Route = createFileRoute("/_authenticated/note/$id")({
   head: () => ({
     meta: [{ title: "Nota — StudyNotes" }],
   }),
@@ -22,7 +22,7 @@ function NotePage() {
   return (
     <AppShell
       middle={<NotesList title={`${notebook.emoji}  ${notebook.name}`} notes={siblings} />}
-      right={<NoteEditor note={note} backTo={{ to: "/notebook/$id", params: { id: notebook.id } }} />}
+      right={<NoteEditor note={note} backTo={{ to: "/_authenticated/notebook/$id", params: { id: notebook.id } }} />}
     />
   );
 }

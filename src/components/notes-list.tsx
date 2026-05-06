@@ -32,11 +32,11 @@ export function NotesList({
           </div>
         ) : (
           notes.map((note) => {
-            const active = path === `/note/${note.id}`;
+            const active = path === `/note/${note.id}` || path.endsWith(`/note/${note.id}`);
             return (
               <Link
                 key={note.id}
-                to="/note/$id"
+                to="/_authenticated/note/$id"
                 params={{ id: note.id }}
                 onClick={onNavigate}
                 className={`block rounded-xl p-3 transition-colors ${
