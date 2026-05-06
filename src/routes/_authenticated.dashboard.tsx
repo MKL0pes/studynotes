@@ -4,7 +4,7 @@ import { NotesList } from "@/components/notes-list";
 import { NoteEditor } from "@/components/note-editor";
 import { notes } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — StudyNotes" },

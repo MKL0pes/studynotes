@@ -4,7 +4,7 @@ import { NotesList } from "@/components/notes-list";
 import { NoteEditor } from "@/components/note-editor";
 import { getNote, getNotebook, getNotesByNotebook } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/note/$id")({
+export const Route = createFileRoute("/_authenticated/note/$id")({
   head: () => ({
     meta: [{ title: "Nota — StudyNotes" }],
   }),
