@@ -9,26 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
-import { Route as AuthenticatedNotebookIdRouteImport } from './routes/_authenticated.notebook.$id'
-import { Route as AuthenticatedNoteIdRouteImport } from './routes/_authenticated.note.$id'
+import { Route as NotebookIdRouteImport } from './routes/notebook.$id'
+import { Route as NoteIdRouteImport } from './routes/note.$id'
 
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -36,92 +30,57 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedNotebookIdRoute = AuthenticatedNotebookIdRouteImport.update({
+const NotebookIdRoute = NotebookIdRouteImport.update({
   id: '/notebook/$id',
   path: '/notebook/$id',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedNoteIdRoute = AuthenticatedNoteIdRouteImport.update({
+const NoteIdRoute = NoteIdRouteImport.update({
   id: '/note/$id',
   path: '/note/$id',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/note/$id': typeof AuthenticatedNoteIdRoute
-  '/notebook/$id': typeof AuthenticatedNotebookIdRoute
+  '/note/$id': typeof NoteIdRoute
+  '/notebook/$id': typeof NotebookIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/note/$id': typeof AuthenticatedNoteIdRoute
-  '/notebook/$id': typeof AuthenticatedNotebookIdRoute
+  '/note/$id': typeof NoteIdRoute
+  '/notebook/$id': typeof NotebookIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/note/$id': typeof AuthenticatedNoteIdRoute
-  '/_authenticated/notebook/$id': typeof AuthenticatedNotebookIdRoute
+  '/note/$id': typeof NoteIdRoute
+  '/notebook/$id': typeof NotebookIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/login'
-    | '/reset-password'
-    | '/dashboard'
-    | '/note/$id'
-    | '/notebook/$id'
+  fullPaths: '/' | '/dashboard' | '/login' | '/note/$id' | '/notebook/$id'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/login'
-    | '/reset-password'
-    | '/dashboard'
-    | '/note/$id'
-    | '/notebook/$id'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/login'
-    | '/reset-password'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/note/$id'
-    | '/_authenticated/notebook/$id'
+  to: '/' | '/dashboard' | '/login' | '/note/$id' | '/notebook/$id'
+  id: '__root__' | '/' | '/dashboard' | '/login' | '/note/$id' | '/notebook/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
+  NoteIdRoute: typeof NoteIdRoute
+  NotebookIdRoute: typeof NotebookIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -129,11 +88,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -143,51 +102,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/notebook/$id': {
-      id: '/_authenticated/notebook/$id'
+    '/notebook/$id': {
+      id: '/notebook/$id'
       path: '/notebook/$id'
       fullPath: '/notebook/$id'
-      preLoaderRoute: typeof AuthenticatedNotebookIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof NotebookIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/note/$id': {
-      id: '/_authenticated/note/$id'
+    '/note/$id': {
+      id: '/note/$id'
       path: '/note/$id'
       fullPath: '/note/$id'
-      preLoaderRoute: typeof AuthenticatedNoteIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof NoteIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedNoteIdRoute: typeof AuthenticatedNoteIdRoute
-  AuthenticatedNotebookIdRoute: typeof AuthenticatedNotebookIdRoute
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedNoteIdRoute: AuthenticatedNoteIdRoute,
-  AuthenticatedNotebookIdRoute: AuthenticatedNotebookIdRoute,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
+  NoteIdRoute: NoteIdRoute,
+  NotebookIdRoute: NotebookIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

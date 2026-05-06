@@ -1,19 +1,12 @@
-import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut } from "lucide-react";
 import { notebooks } from "@/lib/mock-data";
 import { useTheme } from "@/hooks/use-theme";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
 
 export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { theme, toggle } = useTheme();
-  const { signOut } = useAuth();
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    await signOut();
-    navigate({ to: "/login" });
-  };
 
   return (
     <aside className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
@@ -43,11 +36,11 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="mt-2 flex-1 space-y-0.5 overflow-y-auto px-3">
         {notebooks.map((nb) => {
-          const active = path.includes(`/notebook/${nb.id}`);
+          const active = path.startsWith(`/notebook/${nb.id}`);
           return (
             <Link
               key={nb.id}
-              to="/_authenticated/notebook/$id"
+              to="/notebook/$id"
               params={{ id: nb.id }}
               onClick={onNavigate}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
@@ -73,9 +66,9 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Settings className="h-4 w-4" />
             </Button>
-            <button onClick={handleLogout} className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent">
+            <Link to="/login" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent">
               <LogOut className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </div>
       </div>
