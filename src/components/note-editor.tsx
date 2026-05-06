@@ -3,7 +3,7 @@ import { ArrowLeft, MoreHorizontal, Share2, Star } from "lucide-react";
 import type { Note } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 
-export function NoteEditor({ note, backTo }: { note?: Note; backTo?: { to: "/notebook/$id"; params: { id: string } } }) {
+export function NoteEditor({ note, backTo }: { note?: Note; backTo?: { to: "/_authenticated/notebook/$id"; params: { id: string } } }) {
   if (!note) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center bg-background px-6 text-center">
