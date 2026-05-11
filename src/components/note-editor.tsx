@@ -131,6 +131,7 @@ export function NoteEditor({
   backTo?: { to: "/notebook/$id"; params: { id: string } };
 }) {
   const update = useUpdateNote();
+  const del = useDeleteNote();
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
@@ -139,6 +140,14 @@ export function NoteEditor({
     content: "",
     tags: [],
   });
+  // Snapshot of the currently open note to evaluate emptiness on unmount/switch
+  const currentRef = useRef<{
+    id: string;
+    title: string;
+    content: string;
+    tags: string[];
+    is_favorite: boolean;
+  } | null>(null);
 
   const editor = useEditor({
     extensions: [
