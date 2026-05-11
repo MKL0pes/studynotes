@@ -45,7 +45,12 @@ export function NotesList({
         ) : (
           notes.map((note) => {
             const active = path === `/note/${note.id}`;
-            const preview = note.content.slice(0, 140);
+            const preview = note.content
+              .replace(/<[^>]*>/g, " ")
+              .replace(/&nbsp;/g, " ")
+              .replace(/\s+/g, " ")
+              .trim()
+              .slice(0, 140);
             return (
               <Link
                 key={note.id}
