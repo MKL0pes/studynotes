@@ -24,7 +24,8 @@ import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useUpdateNote } from "@/lib/queries";
+import { useUpdateNote, useDeleteNote } from "@/lib/queries";
+import { toast } from "sonner";
 
 const lowlight = createLowlight(common);
 
