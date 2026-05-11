@@ -24,7 +24,8 @@ import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useUpdateNote } from "@/lib/queries";
+import { useUpdateNote, useDeleteNote } from "@/lib/queries";
+import { toast } from "sonner";
 
 const lowlight = createLowlight(common);
 
@@ -130,6 +131,7 @@ export function NoteEditor({
   backTo?: { to: "/notebook/$id"; params: { id: string } };
 }) {
   const update = useUpdateNote();
+  const del = useDeleteNote();
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
@@ -138,6 +140,14 @@ export function NoteEditor({
     content: "",
     tags: [],
   });
+  // Snapshot of the currently open note to evaluate emptiness on unmount/switch
+  const currentRef = useRef<{
+    id: string;
+    title: string;
+    content: string;
+    tags: string[];
+    is_favorite: boolean;
+  } | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -217,9 +227,45 @@ export function NoteEditor({
     };
   }, [editor]);
 
+  // Keep snapshot in sync with current edits
+  useEffect(() => {
+    if (!note || !editor) return;
+    currentRef.current = {
+      id: note.id,
+      title,
+      content: editor.getHTML(),
+      tags,
+      is_favorite: note.is_favorite,
+    };
+  });
+
+  // On note switch / unmount: delete the previous note if it stayed empty
+  useEffect(() => {
+    return () => {
+      const snap = currentRef.current;
+      if (!snap) return;
+      const text = snap.content.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+      const titleEmpty = !snap.title.trim() || snap.title.trim() === "Nova nota";
+      if (titleEmpty && !text && snap.tags.length === 0 && !snap.is_favorite) {
+        del.mutate(snap.id);
+      }
+    };
+  }, [note?.id]);
+
   const toggleFavorite = () => {
     if (!note) return;
     update.mutate({ id: note.id, is_favorite: !note.is_favorite });
+  };
+
+  const handleShare = async () => {
+    if (!note) return;
+    const url = `${window.location.origin}/note/${note.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copiado!");
+    } catch {
+      toast.error("Não foi possível copiar o link");
+    }
   };
 
   const addTag = (raw: string) => {
@@ -293,7 +339,7 @@ export function NoteEditor({
               className={`h-4 w-4 ${note.is_favorite ? "fill-primary text-primary" : ""}`}
             />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare} title="Copiar link">
             <Share2 className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8">
