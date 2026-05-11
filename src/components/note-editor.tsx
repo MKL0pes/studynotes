@@ -19,6 +19,8 @@ import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { FontFamily } from "@tiptap/extension-font-family";
 import { createLowlight, common } from "lowlight";
 import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
@@ -28,6 +30,79 @@ import { useUpdateNote, useDeleteNote } from "@/lib/queries";
 import { toast } from "sonner";
 
 const lowlight = createLowlight(common);
+
+// Custom FontSize mark — extends TextStyle to add a fontSize attribute
+const FontSize = TextStyle.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      fontSize: {
+        default: null,
+        parseHTML: (element) => (element as HTMLElement).style.fontSize || null,
+        renderHTML: (attrs: { fontSize?: string | null }) =>
+          attrs.fontSize ? { style: `font-size: ${attrs.fontSize}` } : {},
+      },
+    };
+  },
+  addCommands() {
+    return {
+      ...this.parent?.(),
+      setFontSize:
+        (size: string) =>
+        ({ chain }: { chain: () => any }) =>
+          chain().setMark("textStyle", { fontSize: size }).run(),
+      unsetFontSize:
+        () =>
+        ({ chain }: { chain: () => any }) =>
+          chain().setMark("textStyle", { fontSize: null }).removeEmptyTextStyle().run(),
+    } as any;
+  },
+});
+
+const FONT_SIZES = [
+  { label: "Pequeno", value: "14px" },
+  { label: "Normal", value: "16px" },
+  { label: "Grande", value: "20px" },
+  { label: "Muito grande", value: "24px" },
+];
+
+const FONT_FAMILIES = [
+  { label: "Inter", value: "Inter, ui-sans-serif, system-ui, sans-serif" },
+  { label: "Georgia", value: "Georgia, 'Times New Roman', serif" },
+  { label: "JetBrains Mono", value: "'JetBrains Mono', ui-monospace, Menlo, monospace" },
+  { label: "Arial", value: "Arial, Helvetica, sans-serif" },
+];
+
+function ToolbarSelect({
+  value,
+  onChange,
+  options,
+  title,
+  width = "w-32",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { label: string; value: string }[];
+  title: string;
+  width?: string;
+}) {
+  return (
+    <select
+      title={title}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onMouseDown={(e) => e.stopPropagation()}
+      className={`h-8 ${width} rounded-md border border-input bg-background px-2 text-xs text-foreground/80 outline-none transition-colors hover:bg-muted focus:ring-1 focus:ring-ring`}
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 
 function ToolbarButton({
   onClick,
@@ -119,6 +194,27 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       >
         <Code2 className="h-4 w-4" />
       </ToolbarButton>
+      {sep}
+      <ToolbarSelect
+        title="Família da fonte"
+        width="w-32"
+        value={(editor.getAttributes("textStyle").fontFamily as string) || ""}
+        onChange={(v) => {
+          if (!v) editor.chain().focus().unsetFontFamily().run();
+          else editor.chain().focus().setFontFamily(v).run();
+        }}
+        options={[{ label: "Fonte", value: "" }, ...FONT_FAMILIES]}
+      />
+      <ToolbarSelect
+        title="Tamanho da fonte"
+        width="w-32"
+        value={(editor.getAttributes("textStyle").fontSize as string) || ""}
+        onChange={(v) => {
+          if (!v) (editor.chain().focus() as any).unsetFontSize().run();
+          else (editor.chain().focus() as any).setFontSize(v).run();
+        }}
+        options={[{ label: "Tamanho", value: "" }, ...FONT_SIZES]}
+      />
     </div>
   );
 }
@@ -154,6 +250,8 @@ export function NoteEditor({
       StarterKit.configure({ codeBlock: false }),
       Underline,
       CodeBlockLowlight.configure({ lowlight, defaultLanguage: "plaintext" }),
+      FontSize,
+      FontFamily.configure({ types: ["textStyle"] }),
     ],
     content: note?.content || "",
     editorProps: {
