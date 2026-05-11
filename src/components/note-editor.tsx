@@ -250,6 +250,8 @@ export function NoteEditor({
       StarterKit.configure({ codeBlock: false }),
       Underline,
       CodeBlockLowlight.configure({ lowlight, defaultLanguage: "plaintext" }),
+      FontSize,
+      FontFamily.configure({ types: ["textStyle"] }),
     ],
     content: note?.content || "",
     editorProps: {
