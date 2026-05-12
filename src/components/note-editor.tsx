@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
+  Archive,
+  ArchiveRestore,
   ArrowLeft,
   Bold,
   Code2,
@@ -11,6 +13,7 @@ import {
   MoreHorizontal,
   Share2,
   Star,
+  Trash2,
   Underline as UnderlineIcon,
   X,
 } from "lucide-react";
@@ -26,6 +29,13 @@ import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useUpdateNote, useDeleteNote } from "@/lib/queries";
 import { toast } from "sonner";
 
