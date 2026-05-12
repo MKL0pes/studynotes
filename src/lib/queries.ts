@@ -19,11 +19,7 @@ export const useNotes = (notebookId?: string) =>
   useQuery({
     queryKey: ["notes", notebookId ?? "all"],
     queryFn: async () => {
-      let q = supabase
-        .from("notes")
-        .select("*")
-        .eq("is_archived", false)
-        .order("updated_at", { ascending: false });
+      let q = supabase.from("notes").select("*").order("updated_at", { ascending: false });
       if (notebookId) q = q.eq("notebook_id", notebookId);
       const { data, error } = await q;
       if (error) throw error;
