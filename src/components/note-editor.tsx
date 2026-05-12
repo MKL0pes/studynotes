@@ -59,12 +59,74 @@ const FontSize = TextStyle.extend({
   },
 });
 
-const FONT_SIZES = [
-  { label: "Pequeno", value: "14px" },
-  { label: "Normal", value: "16px" },
-  { label: "Grande", value: "20px" },
-  { label: "Muito grande", value: "24px" },
-];
+const MIN_FONT_SIZE = 8;
+const MAX_FONT_SIZE = 96;
+const DEFAULT_FONT_SIZE = 16;
+
+function FontSizeControl({ editor }: { editor: Editor }) {
+  const current = (editor.getAttributes("textStyle").fontSize as string) || "";
+  const currentNum = parseInt(current, 10) || DEFAULT_FONT_SIZE;
+  const [val, setVal] = useState<string>(current ? String(currentNum) : "");
+
+  useEffect(() => {
+    setVal(current ? String(parseInt(current, 10) || DEFAULT_FONT_SIZE) : "");
+  }, [current]);
+
+  const apply = (n: number) => {
+    const clamped = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, n));
+    (editor.chain().focus() as any).setFontSize(`${clamped}px`).run();
+    setVal(String(clamped));
+  };
+
+  const bump = (delta: number) => apply((parseInt(val, 10) || DEFAULT_FONT_SIZE) + delta);
+
+  return (
+    <div className="flex items-center gap-0.5">
+      <button
+        type="button"
+        title="Diminuir tamanho"
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => bump(-1)}
+        className="inline-flex h-8 w-7 items-center justify-center rounded-md text-sm text-foreground/70 transition-colors hover:bg-muted"
+      >
+        −
+      </button>
+      <input
+        type="number"
+        min={MIN_FONT_SIZE}
+        max={MAX_FONT_SIZE}
+        value={val}
+        title="Tamanho da fonte (px)"
+        placeholder="16"
+        onMouseDown={(e) => e.stopPropagation()}
+        onChange={(e) => setVal(e.target.value)}
+        onBlur={() => {
+          const n = parseInt(val, 10);
+          if (!Number.isFinite(n)) {
+            (editor.chain().focus() as any).unsetFontSize().run();
+            setVal("");
+          } else apply(n);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
+        className="h-8 w-14 rounded-md border border-input bg-background px-2 text-center text-xs text-foreground/80 outline-none transition-colors focus:ring-1 focus:ring-ring [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      />
+      <button
+        type="button"
+        title="Aumentar tamanho"
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => bump(1)}
+        className="inline-flex h-8 w-7 items-center justify-center rounded-md text-sm text-foreground/70 transition-colors hover:bg-muted"
+      >
+        +
+      </button>
+    </div>
+  );
+}
 
 const FONT_FAMILIES = [
   { label: "Inter", value: "Inter, ui-sans-serif, system-ui, sans-serif" },
