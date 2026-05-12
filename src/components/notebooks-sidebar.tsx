@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut } from "lucide-react";
+import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { useNotebooks, useCreateNotebook } from "@/lib/queries";
 import { notebookEmoji } from "@/lib/db-types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useFilters } from "@/lib/filters-context";
 
 export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
