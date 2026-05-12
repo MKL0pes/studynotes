@@ -37,9 +37,12 @@ export function stripHtml(html: string) {
     .trim();
 }
 
-/** Highlight occurrences of `term` inside `text` (case-insensitive). */
-export function highlight(text: string, term: string) {
-  if (!term.trim()) return [{ text, match: false }];
-  const re = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
-  return text.split(re).map((part) => ({ text: part, match: re.test(part) && part.toLowerCase() === term.toLowerCase() }));
+/** Split text into parts marking occurrences of `term` (case-insensitive). */
+export function highlightParts(text: string, term: string): { text: string; match: boolean }[] {
+  const t = term.trim();
+  if (!t) return [{ text, match: false }];
+  const re = new RegExp(`(${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  const parts = text.split(re);
+  const lower = t.toLowerCase();
+  return parts.map((p) => ({ text: p, match: p.toLowerCase() === lower }));
 }
