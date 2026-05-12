@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut } from "lucide-react";
+import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { useNotebooks, useCreateNotebook } from "@/lib/queries";
 import { notebookEmoji } from "@/lib/db-types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useFilters } from "@/lib/filters-context";
 
 export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -15,6 +16,7 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const createNotebook = useCreateNotebook();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const { search, setSearch } = useFilters();
 
   const handleCreate = async () => {
     const name = window.prompt("Nome do caderno:");
@@ -40,10 +42,26 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <div className="px-3">
-        <button className="flex w-full items-center gap-2 rounded-lg border border-sidebar-border bg-background/50 px-3 py-2 text-sm text-muted-foreground hover:bg-background">
-          <Search className="h-4 w-4" />
-          Buscar...
-        </button>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar notas..."
+            className="w-full rounded-lg border border-sidebar-border bg-background/50 py-2 pl-9 pr-8 text-sm outline-none transition-colors placeholder:text-muted-foreground hover:bg-background focus:border-ring focus:ring-1 focus:ring-ring"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-2 top-1/2 inline-flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+              aria-label="Limpar busca"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-6 flex items-center justify-between px-5">

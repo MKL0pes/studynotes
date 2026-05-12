@@ -1,5 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
+  Archive,
+  ArchiveRestore,
   ArrowLeft,
   Bold,
   Code2,
@@ -11,6 +13,7 @@ import {
   MoreHorizontal,
   Share2,
   Star,
+  Trash2,
   Underline as UnderlineIcon,
   X,
 } from "lucide-react";
@@ -26,6 +29,13 @@ import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useUpdateNote, useDeleteNote } from "@/lib/queries";
 import { toast } from "sonner";
 
@@ -289,6 +299,7 @@ export function NoteEditor({
 }) {
   const update = useUpdateNote();
   const del = useDeleteNote();
+  const navigate = useNavigate();
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
@@ -427,6 +438,31 @@ export function NoteEditor({
     }
   };
 
+  const toggleArchive = () => {
+    if (!note) return;
+    const next = !note.is_archived;
+    // Prevent the empty-on-unmount cleanup from also deleting this note
+    currentRef.current = null;
+    update.mutate(
+      { id: note.id, is_archived: next },
+      {
+        onSuccess: () => toast.success(next ? "Nota arquivada" : "Nota desarquivada"),
+      },
+    );
+  };
+
+  const handleDelete = () => {
+    if (!note) return;
+    if (!window.confirm("Excluir esta nota? Essa ação não pode ser desfeita.")) return;
+    currentRef.current = null;
+    del.mutate(note.id, {
+      onSuccess: () => {
+        toast.success("Nota excluída");
+        navigate({ to: "/dashboard" });
+      },
+    });
+  };
+
   const addTag = (raw: string) => {
     const value = raw.trim().replace(/^#/, "");
     if (!value || tags.includes(value)) return;
@@ -501,9 +537,36 @@ export function NoteEditor({
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare} title="Copiar link">
             <Share2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8" title="Mais ações">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={toggleArchive}>
+                {note.is_archived ? (
+                  <>
+                    <ArchiveRestore className="mr-2 h-4 w-4" />
+                    Desarquivar nota
+                  </>
+                ) : (
+                  <>
+                    <Archive className="mr-2 h-4 w-4" />
+                    Arquivar nota
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleDelete}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Excluir nota
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
