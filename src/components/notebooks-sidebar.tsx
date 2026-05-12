@@ -16,6 +16,7 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const createNotebook = useCreateNotebook();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const { search, setSearch } = useFilters();
 
   const handleCreate = async () => {
     const name = window.prompt("Nome do caderno:");
