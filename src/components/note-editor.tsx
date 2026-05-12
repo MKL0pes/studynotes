@@ -68,9 +68,17 @@ const FONT_SIZES = [
 
 const FONT_FAMILIES = [
   { label: "Inter", value: "Inter, ui-sans-serif, system-ui, sans-serif" },
-  { label: "Georgia", value: "Georgia, 'Times New Roman', serif" },
-  { label: "JetBrains Mono", value: "'JetBrains Mono', ui-monospace, Menlo, monospace" },
   { label: "Arial", value: "Arial, Helvetica, sans-serif" },
+  { label: "Georgia", value: "Georgia, serif" },
+  { label: "Times New Roman", value: "'Times New Roman', Times, serif" },
+  { label: "Trebuchet MS", value: "'Trebuchet MS', sans-serif" },
+  { label: "Verdana", value: "Verdana, Geneva, sans-serif" },
+  { label: "Courier New", value: "'Courier New', Courier, monospace" },
+  { label: "JetBrains Mono", value: "'JetBrains Mono', ui-monospace, Menlo, monospace" },
+  { label: "Playfair Display", value: "'Playfair Display', Georgia, serif" },
+  { label: "Roboto", value: "Roboto, system-ui, sans-serif" },
+  { label: "Lato", value: "Lato, system-ui, sans-serif" },
+  { label: "Merriweather", value: "Merriweather, Georgia, serif" },
 ];
 
 function ToolbarSelect({
