@@ -438,6 +438,31 @@ export function NoteEditor({
     }
   };
 
+  const toggleArchive = () => {
+    if (!note) return;
+    const next = !note.is_archived;
+    // Prevent the empty-on-unmount cleanup from also deleting this note
+    currentRef.current = null;
+    update.mutate(
+      { id: note.id, is_archived: next },
+      {
+        onSuccess: () => toast.success(next ? "Nota arquivada" : "Nota desarquivada"),
+      },
+    );
+  };
+
+  const handleDelete = () => {
+    if (!note) return;
+    if (!window.confirm("Excluir esta nota? Essa ação não pode ser desfeita.")) return;
+    currentRef.current = null;
+    del.mutate(note.id, {
+      onSuccess: () => {
+        toast.success("Nota excluída");
+        navigate({ to: "/dashboard" });
+      },
+    });
+  };
+
   const addTag = (raw: string) => {
     const value = raw.trim().replace(/^#/, "");
     if (!value || tags.includes(value)) return;
