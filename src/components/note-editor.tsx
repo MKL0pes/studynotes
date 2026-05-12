@@ -275,16 +275,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
         }}
         options={[{ label: "Fonte", value: "" }, ...FONT_FAMILIES]}
       />
-      <ToolbarSelect
-        title="Tamanho da fonte"
-        width="w-32"
-        value={(editor.getAttributes("textStyle").fontSize as string) || ""}
-        onChange={(v) => {
-          if (!v) (editor.chain().focus() as any).unsetFontSize().run();
-          else (editor.chain().focus() as any).setFontSize(v).run();
-        }}
-        options={[{ label: "Tamanho", value: "" }, ...FONT_SIZES]}
-      />
+      <FontSizeControl editor={editor} />
     </div>
   );
 }
