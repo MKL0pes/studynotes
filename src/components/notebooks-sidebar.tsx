@@ -114,25 +114,38 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
           notebooks.map((nb) => {
             const active = path.startsWith(`/notebook/${nb.id}`);
             return (
-              <Link
-                key={nb.id}
-                to="/notebook/$id"
-                params={{ id: nb.id }}
-                onClick={onNavigate}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                  active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/60"
-                }`}
-              >
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded-md text-xs"
-                  style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
+              <div key={nb.id} className="group relative">
+                <Link
+                  to="/notebook/$id"
+                  params={{ id: nb.id }}
+                  onClick={onNavigate}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 pr-9 text-sm transition-colors ${
+                    active
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/60"
+                  }`}
                 >
-                  {notebookEmoji(nb.name)}
-                </span>
-                <span className="truncate">{nb.name}</span>
-              </Link>
+                  <span
+                    className="flex h-6 w-6 items-center justify-center rounded-md text-xs"
+                    style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
+                  >
+                    {notebookEmoji(nb.name)}
+                  </span>
+                  <span className="truncate">{nb.name}</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setToDelete(nb);
+                  }}
+                  className="absolute right-1.5 top-1/2 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:flex group-hover:opacity-100"
+                  aria-label={`Excluir caderno ${nb.name}`}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             );
           })
         )}
