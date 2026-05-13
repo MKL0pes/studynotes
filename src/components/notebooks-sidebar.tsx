@@ -1,25 +1,51 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X } from "lucide-react";
+import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { useNotebooks, useCreateNotebook } from "@/lib/queries";
+import { useNotebooks, useCreateNotebook, useDeleteNotebook } from "@/lib/queries";
 import { notebookEmoji } from "@/lib/db-types";
+import type { Notebook } from "@/lib/db-types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useFilters } from "@/lib/filters-context";
 import { CreateNotebookDialog } from "@/components/create-notebook-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { theme, toggle } = useTheme();
   const { data: notebooks = [], isLoading } = useNotebooks();
   const createNotebook = useCreateNotebook();
+  const deleteNotebook = useDeleteNotebook();
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<Notebook | null>(null);
+
+  const handleDelete = async () => {
+    if (!toDelete) return;
+    try {
+      const wasActive = path.startsWith(`/notebook/${toDelete.id}`);
+      await deleteNotebook.mutateAsync(toDelete.id);
+      toast.success("Caderno excluído");
+      setToDelete(null);
+      if (wasActive) navigate({ to: "/" });
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   const handleCreate = async (data: { name: string; color: string }) => {
     try {
@@ -88,25 +114,38 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
           notebooks.map((nb) => {
             const active = path.startsWith(`/notebook/${nb.id}`);
             return (
-              <Link
-                key={nb.id}
-                to="/notebook/$id"
-                params={{ id: nb.id }}
-                onClick={onNavigate}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                  active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/60"
-                }`}
-              >
-                <span
-                  className="flex h-6 w-6 items-center justify-center rounded-md text-xs"
-                  style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
+              <div key={nb.id} className="group relative">
+                <Link
+                  to="/notebook/$id"
+                  params={{ id: nb.id }}
+                  onClick={onNavigate}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 pr-9 text-sm transition-colors ${
+                    active
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/60"
+                  }`}
                 >
-                  {notebookEmoji(nb.name)}
-                </span>
-                <span className="truncate">{nb.name}</span>
-              </Link>
+                  <span
+                    className="flex h-6 w-6 items-center justify-center rounded-md text-xs"
+                    style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
+                  >
+                    {notebookEmoji(nb.name)}
+                  </span>
+                  <span className="truncate">{nb.name}</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setToDelete(nb);
+                  }}
+                  className="absolute right-1.5 top-1/2 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:flex group-hover:opacity-100"
+                  aria-label={`Excluir caderno ${nb.name}`}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             );
           })
         )}
@@ -147,6 +186,33 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
         onCreate={handleCreate}
         isSubmitting={createNotebook.isPending}
       />
+
+      <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir caderno?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O caderno{" "}
+              <span className="font-semibold text-foreground">{toDelete?.name}</span> e{" "}
+              <span className="font-semibold text-foreground">todas as suas notas</span> serão
+              excluídos permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteNotebook.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={deleteNotebook.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteNotebook.isPending ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </aside>
   );
 }
