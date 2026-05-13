@@ -69,8 +69,9 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
       <div className="mt-6 flex items-center justify-between px-5">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cadernos</span>
         <button
-          onClick={handleCreate}
+          onClick={() => setDialogOpen(true)}
           className="rounded-md p-1 text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          aria-label="Novo caderno"
         >
           <Plus className="h-4 w-4" />
         </button>
