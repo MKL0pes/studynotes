@@ -61,6 +61,23 @@ export const useCreateNotebook = () => {
   });
 };
 
+export const useDeleteNotebook = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error: notesErr } = await supabase.from("notes").delete().eq("notebook_id", id);
+      if (notesErr) throw notesErr;
+      const { error } = await supabase.from("notebooks").delete().eq("id", id);
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["notebooks"] });
+      qc.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+};
+
 export const useCreateNote = () => {
   const qc = useQueryClient();
   return useMutation({
