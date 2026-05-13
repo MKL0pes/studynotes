@@ -99,7 +99,12 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
                     : "text-sidebar-foreground hover:bg-sidebar-accent/60"
                 }`}
               >
-                <span className="text-base">{notebookEmoji(nb.name)}</span>
+                <span
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-xs"
+                  style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
+                >
+                  {notebookEmoji(nb.name)}
+                </span>
                 <span className="truncate">{nb.name}</span>
               </Link>
             );
