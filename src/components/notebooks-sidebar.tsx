@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
@@ -8,6 +9,7 @@ import { notebookEmoji } from "@/lib/db-types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useFilters } from "@/lib/filters-context";
+import { CreateNotebookDialog } from "@/components/create-notebook-dialog";
 
 export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -17,12 +19,12 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleCreate = async () => {
-    const name = window.prompt("Nome do caderno:");
-    if (!name?.trim()) return;
+  const handleCreate = async (data: { name: string; color: string }) => {
     try {
-      const nb = await createNotebook.mutateAsync(name.trim());
+      const nb = await createNotebook.mutateAsync(data);
+      setDialogOpen(false);
       navigate({ to: "/notebook/$id", params: { id: nb.id } });
     } catch (e) {
       toast.error((e as Error).message);
