@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
@@ -8,6 +9,7 @@ import { notebookEmoji } from "@/lib/db-types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useFilters } from "@/lib/filters-context";
+import { CreateNotebookDialog } from "@/components/create-notebook-dialog";
 
 export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -17,12 +19,12 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  const handleCreate = async () => {
-    const name = window.prompt("Nome do caderno:");
-    if (!name?.trim()) return;
+  const handleCreate = async (data: { name: string; color: string }) => {
     try {
-      const nb = await createNotebook.mutateAsync(name.trim());
+      const nb = await createNotebook.mutateAsync(data);
+      setDialogOpen(false);
       navigate({ to: "/notebook/$id", params: { id: nb.id } });
     } catch (e) {
       toast.error((e as Error).message);
@@ -67,8 +69,9 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
       <div className="mt-6 flex items-center justify-between px-5">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cadernos</span>
         <button
-          onClick={handleCreate}
+          onClick={() => setDialogOpen(true)}
           className="rounded-md p-1 text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          aria-label="Novo caderno"
         >
           <Plus className="h-4 w-4" />
         </button>
@@ -96,7 +99,12 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
                     : "text-sidebar-foreground hover:bg-sidebar-accent/60"
                 }`}
               >
-                <span className="text-base">{notebookEmoji(nb.name)}</span>
+                <span
+                  className="flex h-6 w-6 items-center justify-center rounded-md text-xs"
+                  style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
+                >
+                  {notebookEmoji(nb.name)}
+                </span>
                 <span className="truncate">{nb.name}</span>
               </Link>
             );
@@ -111,21 +119,34 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
             <span className="text-xs">{theme === "dark" ? "Claro" : "Escuro"}</span>
           </Button>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Link
+              to="/settings"
+              onClick={onNavigate}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              aria-label="Configurações"
+            >
               <Settings className="h-4 w-4" />
-            </Button>
+            </Link>
             <button
               onClick={async () => {
                 await signOut();
                 navigate({ to: "/login" });
               }}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent"
+              aria-label="Sair"
             >
               <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
       </div>
+
+      <CreateNotebookDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onCreate={handleCreate}
+        isSubmitting={createNotebook.isPending}
+      />
     </aside>
   );
 }
