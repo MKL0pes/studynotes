@@ -119,21 +119,34 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
             <span className="text-xs">{theme === "dark" ? "Claro" : "Escuro"}</span>
           </Button>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Link
+              to="/settings"
+              onClick={onNavigate}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              aria-label="Configurações"
+            >
               <Settings className="h-4 w-4" />
-            </Button>
+            </Link>
             <button
               onClick={async () => {
                 await signOut();
                 navigate({ to: "/login" });
               }}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent"
+              aria-label="Sair"
             >
               <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
       </div>
+
+      <CreateNotebookDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onCreate={handleCreate}
+        isSubmitting={createNotebook.isPending}
+      />
     </aside>
   );
 }
