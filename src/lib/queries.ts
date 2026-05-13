@@ -41,12 +41,17 @@ export const useNote = (id: string) =>
 export const useCreateNotebook = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (name: string) => {
+    mutationFn: async ({ name, color }: { name: string; color?: string }) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Não autenticado");
+      const insert: { name: string; user_id: string; color?: string } = {
+        name,
+        user_id: u.user.id,
+      };
+      if (color) insert.color = color;
       const { data, error } = await supabase
         .from("notebooks")
-        .insert({ name, user_id: u.user.id })
+        .insert(insert)
         .select()
         .single();
       if (error) throw error;
