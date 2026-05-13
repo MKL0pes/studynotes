@@ -1,15 +1,26 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X } from "lucide-react";
+import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { useNotebooks, useCreateNotebook } from "@/lib/queries";
+import { useNotebooks, useCreateNotebook, useDeleteNotebook } from "@/lib/queries";
 import { notebookEmoji } from "@/lib/db-types";
+import type { Notebook } from "@/lib/db-types";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useFilters } from "@/lib/filters-context";
 import { CreateNotebookDialog } from "@/components/create-notebook-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
