@@ -27,10 +27,25 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { theme, toggle } = useTheme();
   const { data: notebooks = [], isLoading } = useNotebooks();
   const createNotebook = useCreateNotebook();
+  const deleteNotebook = useDeleteNotebook();
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<Notebook | null>(null);
+
+  const handleDelete = async () => {
+    if (!toDelete) return;
+    try {
+      const wasActive = path.startsWith(`/notebook/${toDelete.id}`);
+      await deleteNotebook.mutateAsync(toDelete.id);
+      toast.success("Caderno excluído");
+      setToDelete(null);
+      if (wasActive) navigate({ to: "/" });
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   const handleCreate = async (data: { name: string; color: string }) => {
     try {
