@@ -327,6 +327,7 @@ export function NoteEditor({
       CodeBlockLowlight.configure({ lowlight, defaultLanguage: "plaintext" }),
       FontSize,
       FontFamily.configure({ types: ["textStyle"] }),
+      Color.configure({ types: ["textStyle"] }),
     ],
     content: note?.content || "",
     editorProps: {
