@@ -42,13 +42,24 @@ export function NotesList({
   isLoading?: boolean;
 }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const { search, filter, setFilter } = useFilters();
+  const { search, filter, setFilter, selectedTags, toggleTag, clearTags, setSearch } =
+    useFilters();
+
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    notes.forEach((n) => (n.tags ?? []).forEach((t) => set.add(t)));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [notes]);
 
   const filtered = useMemo(() => {
     let list = notes;
     if (filter === "favorites") list = list.filter((n) => n.is_favorite && !n.is_archived);
     else if (filter === "archived") list = list.filter((n) => n.is_archived);
     else list = list.filter((n) => !n.is_archived);
+
+    if (selectedTags.length) {
+      list = list.filter((n) => selectedTags.every((t) => (n.tags ?? []).includes(t)));
+    }
 
     const q = search.trim().toLowerCase();
     if (q) {
@@ -59,9 +70,10 @@ export function NotesList({
       });
     }
     return list;
-  }, [notes, filter, search]);
+  }, [notes, filter, search, selectedTags]);
 
   const term = search.trim();
+  const hasActiveFilter = !!term || selectedTags.length > 0 || filter !== "all";
 
   return (
     <div className="flex h-full w-full flex-col bg-card">
