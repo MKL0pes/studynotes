@@ -4,6 +4,7 @@ import {
   ArchiveRestore,
   ArrowLeft,
   Bold,
+  BookOpen,
   Code2,
   Heading1,
   Heading2,
@@ -11,6 +12,7 @@ import {
   List,
   ListOrdered,
   MoreHorizontal,
+  Palette,
   Share2,
   Star,
   Trash2,
@@ -24,6 +26,7 @@ import Underline from "@tiptap/extension-underline";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
+import { Color } from "@tiptap/extension-color";
 import { createLowlight, common } from "lowlight";
 import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
