@@ -7,6 +7,10 @@ type FiltersCtx = {
   setSearch: (v: string) => void;
   filter: NotesFilter;
   setFilter: (f: NotesFilter) => void;
+  selectedTags: string[];
+  toggleTag: (t: string) => void;
+  clearTags: () => void;
+  clearAll: () => void;
 };
 
 const Ctx = createContext<FiltersCtx | null>(null);
@@ -14,8 +18,21 @@ const Ctx = createContext<FiltersCtx | null>(null);
 export function FiltersProvider({ children }: { children: ReactNode }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<NotesFilter>("all");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const toggleTag = (t: string) =>
+    setSelectedTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  const clearTags = () => setSelectedTags([]);
+  const clearAll = () => {
+    setSearch("");
+    setSelectedTags([]);
+    setFilter("all");
+  };
   return (
-    <Ctx.Provider value={{ search, setSearch, filter, setFilter }}>{children}</Ctx.Provider>
+    <Ctx.Provider
+      value={{ search, setSearch, filter, setFilter, selectedTags, toggleTag, clearTags, clearAll }}
+    >
+      {children}
+    </Ctx.Provider>
   );
 }
 

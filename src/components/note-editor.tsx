@@ -24,6 +24,8 @@ import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import { CodeBlockView } from "@/components/code-block-view";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { Color } from "@tiptap/extension-color";
@@ -352,7 +354,21 @@ export function NoteEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       Underline,
-      CodeBlockLowlight.configure({ lowlight, defaultLanguage: "plaintext" }),
+      CodeBlockLowlight.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(CodeBlockView);
+        },
+        addKeyboardShortcuts() {
+          return {
+            ...this.parent?.(),
+            Tab: () => {
+              if (!this.editor.isActive("codeBlock")) return false;
+              this.editor.chain().focus().insertContent("  ").run();
+              return true;
+            },
+          };
+        },
+      }).configure({ lowlight, defaultLanguage: "plaintext" }),
       FontSize,
       FontFamily.configure({ types: ["textStyle"] }),
       Color.configure({ types: ["textStyle"] }),
