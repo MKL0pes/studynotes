@@ -526,6 +526,26 @@ export function NoteEditor({
     return tagColors[h];
   };
 
+  if (readingMode) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-background">
+        <div className="sticky top-0 z-10 flex justify-end border-b border-border/60 bg-background/80 px-6 py-3 backdrop-blur">
+          <Button variant="outline" size="sm" onClick={() => setReadingMode(false)}>
+            <X className="mr-1.5 h-4 w-4" />
+            Sair do modo leitura
+          </Button>
+        </div>
+        <article className="mx-auto max-w-[720px] px-6 py-12 md:py-16">
+          <h1 className="mb-8 text-4xl font-bold tracking-tight">{title || "Sem título"}</h1>
+          <div
+            className="tiptap reading-mode text-[1.0625rem] leading-[1.8]"
+            dangerouslySetInnerHTML={{ __html: editor?.getHTML() || note.content || "" }}
+          />
+        </article>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full w-full flex-col bg-background">
       <div className="flex items-center justify-between border-b border-border px-6 py-3">
