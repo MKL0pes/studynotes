@@ -61,7 +61,10 @@ export function CodeBlockView({ node, updateAttributes, editor }: NodeViewProps)
         </button>
       </div>
       <pre className="overflow-x-auto px-3 py-2 text-sm">
-        <NodeViewContent as="code" className={`language-${language}`} />
+        <NodeViewContent
+          as={"code" as unknown as "div"}
+          className={`language-${language}`}
+        />
       </pre>
     </NodeViewWrapper>
   );
