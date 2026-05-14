@@ -354,7 +354,21 @@ export function NoteEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       Underline,
-      CodeBlockLowlight.configure({ lowlight, defaultLanguage: "plaintext" }),
+      CodeBlockLowlight.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(CodeBlockView);
+        },
+        addKeyboardShortcuts() {
+          return {
+            ...this.parent?.(),
+            Tab: () => {
+              if (!this.editor.isActive("codeBlock")) return false;
+              this.editor.chain().focus().insertContent("  ").run();
+              return true;
+            },
+          };
+        },
+      }).configure({ lowlight, defaultLanguage: "plaintext" }),
       FontSize,
       FontFamily.configure({ types: ["textStyle"] }),
       Color.configure({ types: ["textStyle"] }),
