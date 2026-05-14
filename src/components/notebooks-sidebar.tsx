@@ -30,11 +30,25 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { data: notebooks = [], isLoading } = useNotebooks();
   const createNotebook = useCreateNotebook();
   const deleteNotebook = useDeleteNotebook();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Notebook | null>(null);
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data as { avatar_url: string | null } | null;
+    },
+  });
+  const avatarUrl = profile?.avatar_url ?? null;
 
   const handleDelete = async () => {
     if (!toDelete) return;
