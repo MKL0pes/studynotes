@@ -108,6 +108,48 @@ export function NotesList({
         ))}
       </div>
 
+      {allTags.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5 border-b border-border px-3 py-2">
+          {allTags.map((t) => {
+            const active = selectedTags.includes(t);
+            return (
+              <button
+                key={t}
+                onClick={() => toggleTag(t)}
+                className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
+                  active
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/70"
+                }`}
+              >
+                #{t}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {hasActiveFilter ? (
+        <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
+          <span className="text-[11px] text-muted-foreground">
+            {selectedTags.length > 0
+              ? `${selectedTags.length} tag${selectedTags.length > 1 ? "s" : ""} ativa${selectedTags.length > 1 ? "s" : ""}`
+              : "Filtro ativo"}
+          </span>
+          <button
+            onClick={() => {
+              setSearch("");
+              clearTags();
+              setFilter("all");
+            }}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <X className="h-3 w-3" />
+            Limpar filtros
+          </button>
+        </div>
+      ) : null}
+
       <div className="flex-1 overflow-y-auto p-2">
         {isLoading ? (
           <div className="px-3 py-4 text-xs text-muted-foreground">Carregando...</div>
