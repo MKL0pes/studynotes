@@ -76,12 +76,15 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <aside className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-          <BookOpen className="h-4 w-4" />
+        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-primary text-primary-foreground shadow-sm">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+          ) : (
+            <BookOpen className="h-4 w-4" />
+          )}
         </div>
         <div className="flex flex-col leading-tight">
           <span className="text-sm font-semibold">StudyNotes</span>
-          <span className="text-xs text-muted-foreground">Universitário</span>
         </div>
       </div>
 
