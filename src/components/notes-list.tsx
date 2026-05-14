@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useMemo } from "react";
 import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
