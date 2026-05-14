@@ -289,6 +289,33 @@ function Toolbar({ editor }: { editor: Editor | null }) {
         options={[{ label: "Fonte", value: "" }, ...FONT_FAMILIES]}
       />
       <FontSizeControl editor={editor} />
+      {sep}
+      <label
+        title="Cor do texto"
+        className="relative inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted"
+        onMouseDown={(e) => e.preventDefault()}
+      >
+        <Palette className="h-4 w-4" />
+        <span
+          className="pointer-events-none absolute bottom-1 left-1/2 h-1 w-4 -translate-x-1/2 rounded-sm border border-border"
+          style={{
+            backgroundColor:
+              (editor.getAttributes("textStyle").color as string) || "transparent",
+          }}
+        />
+        <input
+          type="color"
+          value={(editor.getAttributes("textStyle").color as string) || "#000000"}
+          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+      </label>
+      <ToolbarButton
+        title="Limpar cor"
+        onClick={() => editor.chain().focus().unsetColor().run()}
+      >
+        <X className="h-3.5 w-3.5" />
+      </ToolbarButton>
     </div>
   );
 }
