@@ -333,6 +333,7 @@ export function NoteEditor({
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
+  const [readingMode, setReadingMode] = useState(false);
   const lastSavedRef = useRef<{ title: string; content: string; tags: string[] }>({
     title: "",
     content: "",
