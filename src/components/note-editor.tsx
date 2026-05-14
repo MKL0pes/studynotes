@@ -575,6 +575,15 @@ export function NoteEditor({
               className={`h-4 w-4 ${note.is_favorite ? "fill-primary text-primary" : ""}`}
             />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setReadingMode(true)}
+            title="Modo leitura"
+          >
+            <BookOpen className="h-4 w-4" />
+          </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare} title="Copiar link">
             <Share2 className="h-4 w-4" />
           </Button>
