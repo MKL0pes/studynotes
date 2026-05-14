@@ -4,6 +4,7 @@ import {
   ArchiveRestore,
   ArrowLeft,
   Bold,
+  BookOpen,
   Code2,
   Heading1,
   Heading2,
@@ -11,6 +12,7 @@ import {
   List,
   ListOrdered,
   MoreHorizontal,
+  Palette,
   Share2,
   Star,
   Trash2,
@@ -24,6 +26,7 @@ import Underline from "@tiptap/extension-underline";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
+import { Color } from "@tiptap/extension-color";
 import { createLowlight, common } from "lowlight";
 import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
@@ -286,6 +289,33 @@ function Toolbar({ editor }: { editor: Editor | null }) {
         options={[{ label: "Fonte", value: "" }, ...FONT_FAMILIES]}
       />
       <FontSizeControl editor={editor} />
+      {sep}
+      <label
+        title="Cor do texto"
+        className="relative inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-foreground/70 transition-colors hover:bg-muted"
+        onMouseDown={(e) => e.preventDefault()}
+      >
+        <Palette className="h-4 w-4" />
+        <span
+          className="pointer-events-none absolute bottom-1 left-1/2 h-1 w-4 -translate-x-1/2 rounded-sm border border-border"
+          style={{
+            backgroundColor:
+              (editor.getAttributes("textStyle").color as string) || "transparent",
+          }}
+        />
+        <input
+          type="color"
+          value={(editor.getAttributes("textStyle").color as string) || "#000000"}
+          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+      </label>
+      <ToolbarButton
+        title="Limpar cor"
+        onClick={() => editor.chain().focus().unsetColor().run()}
+      >
+        <X className="h-3.5 w-3.5" />
+      </ToolbarButton>
     </div>
   );
 }
@@ -303,6 +333,7 @@ export function NoteEditor({
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
+  const [readingMode, setReadingMode] = useState(false);
   const lastSavedRef = useRef<{ title: string; content: string; tags: string[] }>({
     title: "",
     content: "",
@@ -324,6 +355,7 @@ export function NoteEditor({
       CodeBlockLowlight.configure({ lowlight, defaultLanguage: "plaintext" }),
       FontSize,
       FontFamily.configure({ types: ["textStyle"] }),
+      Color.configure({ types: ["textStyle"] }),
     ],
     content: note?.content || "",
     editorProps: {
@@ -494,6 +526,26 @@ export function NoteEditor({
     return tagColors[h];
   };
 
+  if (readingMode) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-y-auto bg-background">
+        <div className="sticky top-0 z-10 flex justify-end border-b border-border/60 bg-background/80 px-6 py-3 backdrop-blur">
+          <Button variant="outline" size="sm" onClick={() => setReadingMode(false)}>
+            <X className="mr-1.5 h-4 w-4" />
+            Sair do modo leitura
+          </Button>
+        </div>
+        <article className="mx-auto max-w-[720px] px-6 py-12 md:py-16">
+          <h1 className="mb-8 text-4xl font-bold tracking-tight">{title || "Sem título"}</h1>
+          <div
+            className="tiptap reading-mode text-[1.0625rem] leading-[1.8]"
+            dangerouslySetInnerHTML={{ __html: editor?.getHTML() || note.content || "" }}
+          />
+        </article>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full w-full flex-col bg-background">
       <div className="flex items-center justify-between border-b border-border px-6 py-3">
@@ -522,6 +574,15 @@ export function NoteEditor({
             <Star
               className={`h-4 w-4 ${note.is_favorite ? "fill-primary text-primary" : ""}`}
             />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setReadingMode(true)}
+            title="Modo leitura"
+          >
+            <BookOpen className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleShare} title="Copiar link">
             <Share2 className="h-4 w-4" />
