@@ -40,6 +40,7 @@
         "@tanstack/react-start": "^1.167.50",
         "@tanstack/router-plugin": "^1.167.28",
         "@tiptap/extension-code-block-lowlight": "^3.23.1",
+        "@tiptap/extension-color": "^3.23.1",
         "@tiptap/extension-font-family": "^3.23.1",
         "@tiptap/extension-text-style": "^3.23.1",
         "@tiptap/extension-underline": "^3.23.1",
@@ -601,6 +602,8 @@
     "@tiptap/extension-code-block": ["@tiptap/extension-code-block@3.23.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tiptap/extension-code-block/-/extension-code-block-3.23.1.tgz", { "peerDependencies": { "@tiptap/core": "3.23.1", "@tiptap/pm": "3.23.1" } }, "sha512-BdJGqM57CsKgYrQUZz78vIG8Yn7EpsE2pA7iKn5tYoSXpYtt0IaU4qB1heH7lwWD/vVCAm0YQVD7/0F+0++yhA=="],
 
     "@tiptap/extension-code-block-lowlight": ["@tiptap/extension-code-block-lowlight@3.23.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tiptap/extension-code-block-lowlight/-/extension-code-block-lowlight-3.23.1.tgz", { "peerDependencies": { "@tiptap/core": "3.23.1", "@tiptap/extension-code-block": "3.23.1", "@tiptap/pm": "3.23.1", "highlight.js": "^11", "lowlight": "^2 || ^3" } }, "sha512-Z+PYJH53BXtrK17p8JgppaU66C83q9HfwMHDO4pYoMcjokDBJXOIaDeO+6MzwkzsyeH4/BxK5uFqDSr6w34Mgw=="],
+
+    "@tiptap/extension-color": ["@tiptap/extension-color@3.23.4", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tiptap/extension-color/-/extension-color-3.23.4.tgz", { "peerDependencies": { "@tiptap/extension-text-style": "3.23.4" } }, "sha512-8phVTsRgvT+0wnDh+z6eIIa0IksVRnLKM2Av89vPHOFUhCt/bJdolAfXSC+eWqxjgoYOikzi5yk3QHYbGvOu1Q=="],
 
     "@tiptap/extension-document": ["@tiptap/extension-document@3.23.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@tiptap/extension-document/-/extension-document-3.23.1.tgz", { "peerDependencies": { "@tiptap/core": "3.23.1" } }, "sha512-NA5Rx59HRwG6Hb6LwLpC5lE7z6vCj6f90S7RNNsnE+CyiXNR/OhY2BcjuxiGnascHvsnsAbvxGU3ymKMDgvDVg=="],
 
