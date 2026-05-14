@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { useNotebooks, useCreateNotebook, useDeleteNotebook } from "@/lib/queries";
 import { notebookEmoji } from "@/lib/db-types";
 import type { Notebook } from "@/lib/db-types";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useFilters } from "@/lib/filters-context";
@@ -28,11 +30,25 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { data: notebooks = [], isLoading } = useNotebooks();
   const createNotebook = useCreateNotebook();
   const deleteNotebook = useDeleteNotebook();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Notebook | null>(null);
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data as { avatar_url: string | null } | null;
+    },
+  });
+  const avatarUrl = profile?.avatar_url ?? null;
 
   const handleDelete = async () => {
     if (!toDelete) return;
@@ -60,12 +76,15 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <aside className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-          <BookOpen className="h-4 w-4" />
+        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-primary text-primary-foreground shadow-sm">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+          ) : (
+            <BookOpen className="h-4 w-4" />
+          )}
         </div>
         <div className="flex flex-col leading-tight">
           <span className="text-sm font-semibold">StudyNotes</span>
-          <span className="text-xs text-muted-foreground">Universitário</span>
         </div>
       </div>
 

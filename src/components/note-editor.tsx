@@ -409,18 +409,7 @@ export function NoteEditor({
     };
   });
 
-  // On note switch / unmount: delete the previous note if it stayed empty
-  useEffect(() => {
-    return () => {
-      const snap = currentRef.current;
-      if (!snap) return;
-      const text = snap.content.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
-      const titleEmpty = !snap.title.trim() || snap.title.trim() === "Nova nota";
-      if (titleEmpty && !text && snap.tags.length === 0 && !snap.is_favorite) {
-        del.mutate(snap.id);
-      }
-    };
-  }, [note?.id]);
+  // Notes are only deleted via explicit user action (handleDelete).
 
   const toggleFavorite = () => {
     if (!note) return;
