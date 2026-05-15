@@ -810,6 +810,8 @@ export function NoteEditor({
           </div>
         </div>
       </div>
+
+      <ShareNoteDialog open={shareOpen} onOpenChange={setShareOpen} noteId={note.id} />
     </div>
   );
 }
