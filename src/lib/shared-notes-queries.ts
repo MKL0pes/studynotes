@@ -61,7 +61,9 @@ export const useSharedNotes = (email?: string) =>
         .select("*")
         .in("id", ids);
       if (nErr) throw nErr;
-      const byId = new Map((shares || []).map((s: any) => [s.note_id, s]));
+      const byId = new Map<string, { permission: "view" | "edit"; accepted: boolean }>(
+        (shares || []).map((s: any) => [s.note_id as string, { permission: s.permission, accepted: !!s.accepted }]),
+      );
       return (notes as Note[]).map((n) => ({
         ...n,
         _permission: byId.get(n.id)?.permission as "view" | "edit",
