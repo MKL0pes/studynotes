@@ -141,7 +141,10 @@ export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeVi
         </button>
       </div>
 
-      <div className="code-block-body relative flex bg-[#1e1e2e]">
+      <div
+        className="code-block-body relative flex overflow-auto bg-[#1e1e2e]"
+        style={height ? { height: `${height}px` } : undefined}
+      >
         <div
           aria-hidden
           contentEditable={false}
@@ -158,6 +161,14 @@ export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeVi
             className={`hljs language-${language}`}
           />
         </pre>
+      </div>
+      <div
+        contentEditable={false}
+        onMouseDown={startResize}
+        title="Arraste para redimensionar"
+        className="group flex h-2.5 cursor-ns-resize items-center justify-center bg-[#181825] hover:bg-[#313244]"
+      >
+        <GripHorizontal className="h-3 w-3 text-[#6c7086] group-hover:text-[#cdd6f4]" />
       </div>
     </NodeViewWrapper>
   );
