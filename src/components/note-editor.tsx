@@ -467,6 +467,7 @@ export function NoteEditor({
       Color.configure({ types: ["textStyle"] }),
     ],
     content: note?.content || "",
+    editable: !readOnly,
     editorProps: {
       attributes: { class: "tiptap" },
       transformPastedHTML: (html) => html,
