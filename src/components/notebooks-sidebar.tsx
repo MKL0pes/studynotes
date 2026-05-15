@@ -29,11 +29,13 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { theme, toggle } = useTheme();
   const { data: notebooks = [], isLoading } = useNotebooks();
   const createNotebook = useCreateNotebook();
+  const updateNotebook = useUpdateNotebook();
   const deleteNotebook = useDeleteNotebook();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [toEdit, setToEdit] = useState<Notebook | null>(null);
   const [toDelete, setToDelete] = useState<Notebook | null>(null);
 
   const { data: profile } = useQuery({
