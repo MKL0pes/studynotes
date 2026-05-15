@@ -75,6 +75,17 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
     }
   };
 
+  const handleEditSubmit = async (data: { name: string; color: string; icon_name: string }) => {
+    if (!toEdit) return;
+    try {
+      await updateNotebook.mutateAsync({ id: toEdit.id, ...data });
+      toast.success("Caderno atualizado");
+      setToEdit(null);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
   return (
     <aside className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 px-5 py-5">
