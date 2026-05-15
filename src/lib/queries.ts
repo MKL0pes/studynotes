@@ -41,14 +41,15 @@ export const useNote = (id: string) =>
 export const useCreateNotebook = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ name, color }: { name: string; color?: string }) => {
+    mutationFn: async ({ name, color, icon_name }: { name: string; color?: string; icon_name?: string }) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Não autenticado");
-      const insert: { name: string; user_id: string; color?: string } = {
+      const insert: { name: string; user_id: string; color?: string; icon_name?: string } = {
         name,
         user_id: u.user.id,
       };
       if (color) insert.color = color;
+      if (icon_name) insert.icon_name = icon_name;
       const { data, error } = await supabase
         .from("notebooks")
         .insert(insert)
