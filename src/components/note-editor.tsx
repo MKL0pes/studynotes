@@ -689,8 +689,7 @@ export function NoteEditor({
         <div className="flex items-center gap-2">
           {backTo ? (
             <Link
-              to={backTo.to}
-              params={backTo.params}
+              {...(backTo as any)}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted md:hidden"
             >
               <ArrowLeft className="h-4 w-4" />
