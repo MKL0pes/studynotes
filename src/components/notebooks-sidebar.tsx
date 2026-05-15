@@ -144,12 +144,17 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
                       : "text-sidebar-foreground hover:bg-sidebar-accent/60"
                   }`}
                 >
-                  <span
-                    className="flex h-6 w-6 items-center justify-center rounded-md text-xs"
-                    style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
-                  >
-                    {notebookEmoji(nb.name)}
-                  </span>
+                  {(() => {
+                    const Icon = getNotebookIcon(nb.icon_name);
+                    return (
+                      <span
+                        className="flex h-6 w-6 items-center justify-center rounded-md"
+                        style={{ backgroundColor: `${nb.color}22`, color: nb.color }}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                      </span>
+                    );
+                  })()}
                   <span className="truncate">{nb.name}</span>
                 </Link>
                 <button
