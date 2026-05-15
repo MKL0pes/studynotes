@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer, NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { Check, X } from "lucide-react";
+import { Check, Minus, Plus, X } from "lucide-react";
 import { useState } from "react";
 
 type QuizType = "multiple" | "boolean";
@@ -9,7 +9,7 @@ function QuizView({ node, updateAttributes, editor }: NodeViewProps) {
   const editable = editor.isEditable;
   const question = (node.attrs.question as string) || "";
   const type = (node.attrs.type as QuizType) || "multiple";
-  const options = (node.attrs.options as string[]) || ["", "", "", ""];
+  const options = (node.attrs.options as string[]) || ["", ""];
   const correct = node.attrs.correct as number | null;
   const chosen = node.attrs.chosen as number | null;
   const [editingMode, setEditingMode] = useState(editable);
@@ -18,6 +18,19 @@ function QuizView({ node, updateAttributes, editor }: NodeViewProps) {
     const next = [...options];
     next[i] = v;
     updateAttributes({ options: next });
+  };
+
+  const addOption = () => {
+    updateAttributes({ options: [...options, ""] });
+  };
+
+  const removeOption = (i: number) => {
+    if (options.length <= 2) return;
+    const next = options.filter((_, idx) => idx !== i);
+    let nextCorrect = correct;
+    if (correct === i) nextCorrect = null;
+    else if (correct !== null && correct > i) nextCorrect = correct - 1;
+    updateAttributes({ options: next, correct: nextCorrect, chosen: null });
   };
 
   const choose = (i: number) => {
@@ -153,9 +166,30 @@ function QuizView({ node, updateAttributes, editor }: NodeViewProps) {
                   ) : (
                     <span className="flex-1 text-sm">{opt || `Alternativa ${i + 1}`}</span>
                   )}
+                  {editingMode && (
+                    <button
+                      type="button"
+                      onClick={() => removeOption(i)}
+                      disabled={options.length <= 2}
+                      title={options.length <= 2 ? "Mínimo 2 alternativas" : "Remover alternativa"}
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
               );
             })}
+            {editingMode && (
+              <button
+                type="button"
+                onClick={addOption}
+                className="mt-1 inline-flex items-center gap-1 rounded-md border border-dashed border-input px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Adicionar alternativa
+              </button>
+            )}
           </div>
         )}
 
