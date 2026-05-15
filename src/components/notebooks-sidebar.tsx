@@ -6,7 +6,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { useNotebooks, useCreateNotebook, useDeleteNotebook } from "@/lib/queries";
-import { notebookEmoji } from "@/lib/db-types";
+import { getNotebookIcon } from "@/lib/notebook-icons";
 import type { Notebook } from "@/lib/db-types";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "@tanstack/react-router";
