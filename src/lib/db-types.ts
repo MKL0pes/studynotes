@@ -3,6 +3,7 @@ export type Notebook = {
   user_id: string;
   name: string;
   color: string;
+  icon_name: string;
   created_at: string;
 };
 
