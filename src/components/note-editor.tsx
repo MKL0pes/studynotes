@@ -48,7 +48,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUpdateNote, useDeleteNote } from "@/lib/queries";
 import { useAuth } from "@/hooks/use-auth";
-import { ListChecks, HelpCircle } from "lucide-react";
+import { ListChecks, HelpCircle, UserPlus } from "lucide-react";
+import { ShareNoteDialog } from "@/components/editor/share-dialog";
 import { toast } from "sonner";
 
 // Custom FontSize mark — extends TextStyle to add a fontSize attribute
@@ -364,9 +365,11 @@ function Toolbar({ editor, noteId, userId, onAfterInsert }: { editor: Editor | n
 export function NoteEditor({
   note,
   backTo,
+  readOnly = false,
 }: {
   note?: Note;
-  backTo?: { to: "/notebook/$id"; params: { id: string } };
+  backTo?: { to: "/notebook/$id"; params: { id: string } } | { to: "/dashboard" };
+  readOnly?: boolean;
 }) {
   const update = useUpdateNote();
   const del = useDeleteNote();
@@ -375,7 +378,8 @@ export function NoteEditor({
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
-  const [readingMode, setReadingMode] = useState(false);
+  const [readingMode, setReadingMode] = useState(readOnly);
+  const [shareOpen, setShareOpen] = useState(false);
   const lastSavedRef = useRef<{ title: string; content: string; tags: string[] }>({
     title: "",
     content: "",
@@ -463,6 +467,7 @@ export function NoteEditor({
       Color.configure({ types: ["textStyle"] }),
     ],
     content: note?.content || "",
+    editable: !readOnly,
     editorProps: {
       attributes: { class: "tiptap" },
       transformPastedHTML: (html) => html,
@@ -527,9 +532,9 @@ export function NoteEditor({
     };
   }, [note?.id, editor]);
 
-  // Debounced autosave
+  // Debounced autosave (skipped in readOnly mode)
   useEffect(() => {
-    if (!note || !editor) return;
+    if (!note || !editor || readOnly) return;
     const t = setTimeout(() => {
       const content = editor.getHTML();
       const last = lastSavedRef.current;
@@ -541,7 +546,7 @@ export function NoteEditor({
       }
     }, 800);
     return () => clearTimeout(t);
-  }, [title, tags, note?.id, editor]);
+  }, [title, tags, note?.id, editor, readOnly]);
 
   // Force-save immediately (used right after inserting special blocks).
   const flushSave = () => {
@@ -685,8 +690,7 @@ export function NoteEditor({
         <div className="flex items-center gap-2">
           {backTo ? (
             <Link
-              to={backTo.to}
-              params={backTo.params}
+              {...(backTo as any)}
               className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted md:hidden"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -697,17 +701,19 @@ export function NoteEditor({
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={toggleFavorite}
-            title={note.is_favorite ? "Remover dos favoritos" : "Favoritar"}
-          >
-            <Star
-              className={`h-4 w-4 ${note.is_favorite ? "fill-primary text-primary" : ""}`}
-            />
-          </Button>
+          {!readOnly && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={toggleFavorite}
+              title={note.is_favorite ? "Remover dos favoritos" : "Favoritar"}
+            >
+              <Star
+                className={`h-4 w-4 ${note.is_favorite ? "fill-primary text-primary" : ""}`}
+              />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -727,23 +733,32 @@ export function NoteEditor({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={toggleArchive}>
-                {note.is_archived ? (
-                  <>
-                    <ArchiveRestore className="mr-2 h-4 w-4" />
-                    Desarquivar nota
-                  </>
-                ) : (
-                  <>
-                    <Archive className="mr-2 h-4 w-4" />
-                    Arquivar nota
-                  </>
-                )}
-              </DropdownMenuItem>
+              {!readOnly && (
+                <DropdownMenuItem onClick={toggleArchive}>
+                  {note.is_archived ? (
+                    <>
+                      <ArchiveRestore className="mr-2 h-4 w-4" />
+                      Desarquivar nota
+                    </>
+                  ) : (
+                    <>
+                      <Archive className="mr-2 h-4 w-4" />
+                      Arquivar nota
+                    </>
+                  )}
+                </DropdownMenuItem>
+              )}
+              {!readOnly && (
+                <DropdownMenuItem onClick={() => setShareOpen(true)}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Compartilhar nota
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleDelete}
                 className="text-destructive focus:text-destructive"
+                disabled={readOnly}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Excluir nota
@@ -753,7 +768,9 @@ export function NoteEditor({
         </div>
       </div>
 
-      <Toolbar editor={editor} noteId={note.id} userId={user?.id} onAfterInsert={flushSave} />
+      {!readOnly && (
+        <Toolbar editor={editor} noteId={note.id} userId={user?.id} onAfterInsert={flushSave} />
+      )}
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-6 py-8 md:px-10 md:py-10">
@@ -797,6 +814,8 @@ export function NoteEditor({
           </div>
         </div>
       </div>
+
+      <ShareNoteDialog open={shareOpen} onOpenChange={setShareOpen} noteId={note.id} />
     </div>
   );
 }

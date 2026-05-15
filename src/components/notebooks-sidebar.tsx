@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Pencil, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
+import { BookOpen, Pencil, Plus, Search, Settings, Moon, Sun, LogOut, Users, X, Trash2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { useNotebooks, useCreateNotebook, useDeleteNotebook, useUpdateNotebook } from "@/lib/queries";
+import { useIncomingShares, useSharedNotes } from "@/lib/shared-notes-queries";
 import { getNotebookIcon } from "@/lib/notebook-icons";
 import type { Notebook } from "@/lib/db-types";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +38,9 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [toEdit, setToEdit] = useState<Notebook | null>(null);
   const [toDelete, setToDelete] = useState<Notebook | null>(null);
+  const { data: incomingShares = [] } = useIncomingShares(user?.email ?? undefined);
+  const { data: sharedNotes = [] } = useSharedNotes(user?.email ?? undefined);
+  const pendingCount = incomingShares.filter((s) => !s.accepted).length;
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -199,6 +203,45 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
                   </button>
                 </div>
               </div>
+            );
+          })
+        )}
+      </nav>
+
+      <div className="mt-4 flex items-center justify-between px-5">
+        <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Users className="h-3.5 w-3.5" />
+          Compartilhadas comigo
+        </span>
+        {pendingCount > 0 && (
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">
+            {pendingCount}
+          </span>
+        )}
+      </div>
+      <nav className="mt-1 max-h-48 space-y-0.5 overflow-y-auto px-3 pb-2">
+        {sharedNotes.length === 0 ? (
+          <div className="px-3 py-2 text-xs text-muted-foreground">Nada compartilhado.</div>
+        ) : (
+          sharedNotes.map((n) => {
+            const active = path === `/shared/${n.id}`;
+            return (
+              <Link
+                key={n.id}
+                to="/shared/$id"
+                params={{ id: n.id }}
+                onClick={onNavigate}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                  active
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/60"
+                }`}
+              >
+                <span className="flex-1 truncate">{n.title || "Sem título"}</span>
+                <span className="shrink-0 text-[10px] uppercase text-muted-foreground">
+                  {n._permission === "edit" ? "Edit" : "Ver"}
+                </span>
+              </Link>
             );
           })
         )}

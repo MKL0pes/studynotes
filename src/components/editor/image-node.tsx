@@ -6,7 +6,7 @@ import {
   type NodeViewProps,
 } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
-import { AlignCenter, AlignLeft, AlignRight, Captions, Trash2 } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, Captions, GripVertical, Trash2 } from "lucide-react";
 
 type Align = "left" | "center" | "right";
 
@@ -21,13 +21,6 @@ function ResizableImageView({ node, updateAttributes, selected, deleteNode, edit
   const [editingCaption, setEditingCaption] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [naturalRatio, setNaturalRatio] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (imgRef.current?.complete && imgRef.current.naturalWidth) {
-      setNaturalRatio(imgRef.current.naturalHeight / imgRef.current.naturalWidth);
-    }
-  }, [src]);
 
   const startResize = (
     e: React.MouseEvent,
@@ -55,28 +48,30 @@ function ResizableImageView({ node, updateAttributes, selected, deleteNode, edit
     document.addEventListener("mouseup", onUp);
   };
 
-  const justify =
-    align === "left" ? "justify-start" : align === "right" ? "justify-end" : "justify-center";
+  // Wrapper class applies float so text flows around left/right images.
+  const wrapperClass =
+    align === "left"
+      ? "float-left mr-4 mb-2 clear-left"
+      : align === "right"
+        ? "float-right ml-4 mb-2 clear-right"
+        : "mx-auto block my-3 clear-both";
 
   const handle =
     "absolute z-10 h-3 w-3 rounded-sm border border-primary bg-background shadow";
 
   return (
-    <NodeViewWrapper className={`my-3 flex ${justify}`}>
+    <NodeViewWrapper className={wrapperClass}>
       <figure
         ref={wrapperRef}
-        className={`relative inline-block max-w-full ${selected ? "outline outline-2 outline-primary/60" : ""}`}
+        className={`relative max-w-full ${selected ? "outline outline-2 outline-primary/60" : ""}`}
         style={{ width: width ? `${width}px` : "auto" }}
       >
         <img
           ref={imgRef}
           src={src}
           alt={alt}
-          draggable={false}
-          onLoad={(e) => {
-            const t = e.currentTarget;
-            if (t.naturalWidth) setNaturalRatio(t.naturalHeight / t.naturalWidth);
-          }}
+          draggable={true}
+          data-drag-handle
           className="block h-auto w-full select-none rounded-md"
         />
 
@@ -93,11 +88,19 @@ function ResizableImageView({ node, updateAttributes, selected, deleteNode, edit
               contentEditable={false}
               className="absolute -top-10 left-1/2 z-20 flex -translate-x-1/2 items-center gap-0.5 rounded-md border border-border bg-popover p-1 shadow-md"
             >
+              <span
+                title="Arrastar imagem"
+                data-drag-handle
+                className="inline-flex h-7 w-7 cursor-grab items-center justify-center rounded text-foreground/60 hover:bg-muted active:cursor-grabbing"
+              >
+                <GripVertical className="h-3.5 w-3.5" />
+              </span>
+              <div className="mx-1 h-5 w-px bg-border" />
               {(
                 [
-                  { v: "left", Icon: AlignLeft, t: "Esquerda" },
+                  { v: "left", Icon: AlignLeft, t: "Esquerda (texto envolve)" },
                   { v: "center", Icon: AlignCenter, t: "Centro" },
-                  { v: "right", Icon: AlignRight, t: "Direita" },
+                  { v: "right", Icon: AlignRight, t: "Direita (texto envolve)" },
                 ] as { v: Align; Icon: typeof AlignLeft; t: string }[]
               ).map(({ v, Icon, t }) => (
                 <button
@@ -161,7 +164,6 @@ function ResizableImageView({ node, updateAttributes, selected, deleteNode, edit
           </figcaption>
         )}
       </figure>
-      <span className="hidden">{naturalRatio ?? ""}</span>
     </NodeViewWrapper>
   );
 }

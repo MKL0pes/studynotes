@@ -13,6 +13,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SharedIdRouteImport } from './routes/shared.$id'
 import { Route as NotebookIdRouteImport } from './routes/notebook.$id'
 import { Route as NoteIdRouteImport } from './routes/note.$id'
 
@@ -36,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SharedIdRoute = SharedIdRouteImport.update({
+  id: '/shared/$id',
+  path: '/shared/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NotebookIdRoute = NotebookIdRouteImport.update({
   id: '/notebook/$id',
   path: '/notebook/$id',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/note/$id': typeof NoteIdRoute
   '/notebook/$id': typeof NotebookIdRoute
+  '/shared/$id': typeof SharedIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/note/$id': typeof NoteIdRoute
   '/notebook/$id': typeof NotebookIdRoute
+  '/shared/$id': typeof SharedIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/note/$id': typeof NoteIdRoute
   '/notebook/$id': typeof NotebookIdRoute
+  '/shared/$id': typeof SharedIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/note/$id'
     | '/notebook/$id'
+    | '/shared/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/note/$id'
     | '/notebook/$id'
+    | '/shared/$id'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/note/$id'
     | '/notebook/$id'
+    | '/shared/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,6 +118,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   NoteIdRoute: typeof NoteIdRoute
   NotebookIdRoute: typeof NotebookIdRoute
+  SharedIdRoute: typeof SharedIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shared/$id': {
+      id: '/shared/$id'
+      path: '/shared/$id'
+      fullPath: '/shared/$id'
+      preLoaderRoute: typeof SharedIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/notebook/$id': {
       id: '/notebook/$id'
       path: '/notebook/$id'
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   NoteIdRoute: NoteIdRoute,
   NotebookIdRoute: NotebookIdRoute,
+  SharedIdRoute: SharedIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

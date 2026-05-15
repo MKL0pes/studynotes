@@ -115,12 +115,50 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_notes: {
+        Row: {
+          accepted: boolean
+          created_at: string
+          id: string
+          note_id: string
+          owner_id: string
+          permission: string
+          shared_with_email: string
+        }
+        Insert: {
+          accepted?: boolean
+          created_at?: string
+          id?: string
+          note_id: string
+          owner_id: string
+          permission?: string
+          shared_with_email: string
+        }
+        Update: {
+          accepted?: boolean
+          created_at?: string
+          id?: string
+          note_id?: string
+          owner_id?: string
+          permission?: string
+          shared_with_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_notes_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_user_email: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
