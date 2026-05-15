@@ -62,6 +62,26 @@ export const useCreateNotebook = () => {
   });
 };
 
+export const useUpdateNotebook = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      ...patch
+    }: { id: string } & Partial<Pick<Notebook, "name" | "color" | "icon_name">>) => {
+      const { data, error } = await supabase
+        .from("notebooks")
+        .update(patch)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Notebook;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["notebooks"] }),
+  });
+};
+
 export const useDeleteNotebook = () => {
   const qc = useQueryClient();
   return useMutation({

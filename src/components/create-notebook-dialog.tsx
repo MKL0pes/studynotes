@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,22 +19,39 @@ export const NOTEBOOK_COLORS = [
   "#EF4444", "#EC4899", "#8B5CF6", "#14B8A6",
 ];
 
+type NotebookData = { name: string; color: string; icon_name: string };
+
 export function CreateNotebookDialog({
   open,
   onOpenChange,
   onCreate,
   isSubmitting,
+  initial,
+  mode = "create",
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onCreate: (data: { name: string; color: string; icon_name: string }) => void | Promise<void>;
+  onCreate: (data: NotebookData) => void | Promise<void>;
   isSubmitting?: boolean;
+  initial?: NotebookData;
+  mode?: "create" | "edit";
 }) {
-  const [name, setName] = useState("");
-  const [color, setColor] = useState(NOTEBOOK_COLORS[0]);
-  const [iconName, setIconName] = useState("BookOpen");
+  const [name, setName] = useState(initial?.name ?? "");
+  const [color, setColor] = useState(initial?.color ?? NOTEBOOK_COLORS[0]);
+  const [iconName, setIconName] = useState(initial?.icon_name ?? "BookOpen");
   const [iconQuery, setIconQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  // Re-hydrate when opening for a different notebook
+  useEffect(() => {
+    if (open) {
+      setName(initial?.name ?? "");
+      setColor(initial?.color ?? NOTEBOOK_COLORS[0]);
+      setIconName(initial?.icon_name ?? "BookOpen");
+      setIconQuery("");
+      setError(null);
+    }
+  }, [open, initial?.name, initial?.color, initial?.icon_name]);
 
   const reset = () => {
     setName("");
@@ -61,7 +78,7 @@ export function CreateNotebookDialog({
       return;
     }
     await onCreate({ name: trimmed, color, icon_name: iconName });
-    reset();
+    if (mode === "create") reset();
   };
 
   return (
@@ -69,15 +86,17 @@ export function CreateNotebookDialog({
       open={open}
       onOpenChange={(v) => {
         onOpenChange(v);
-        if (!v) reset();
+        if (!v && mode === "create") reset();
       }}
     >
       <DialogContent className="sm:max-w-[480px]">
         <form onSubmit={handleSubmit} className="space-y-5">
           <DialogHeader>
-            <DialogTitle>Novo caderno</DialogTitle>
+            <DialogTitle>{mode === "edit" ? "Editar caderno" : "Novo caderno"}</DialogTitle>
             <DialogDescription>
-              Organize suas anotações por matéria ou projeto.
+              {mode === "edit"
+                ? "Atualize o nome, a cor ou o ícone do caderno."
+                : "Organize suas anotações por matéria ou projeto."}
             </DialogDescription>
           </DialogHeader>
 
@@ -178,7 +197,9 @@ export function CreateNotebookDialog({
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting || !name.trim()}>
-              {isSubmitting ? "Criando..." : "Criar caderno"}
+              {isSubmitting
+                ? mode === "edit" ? "Salvando..." : "Criando..."
+                : mode === "edit" ? "Salvar alterações" : "Criar caderno"}
             </Button>
           </DialogFooter>
         </form>

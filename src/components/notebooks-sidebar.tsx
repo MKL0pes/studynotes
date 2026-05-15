@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
+import { BookOpen, Pencil, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { useNotebooks, useCreateNotebook, useDeleteNotebook } from "@/lib/queries";
+import { useNotebooks, useCreateNotebook, useDeleteNotebook, useUpdateNotebook } from "@/lib/queries";
 import { getNotebookIcon } from "@/lib/notebook-icons";
 import type { Notebook } from "@/lib/db-types";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,11 +29,13 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { theme, toggle } = useTheme();
   const { data: notebooks = [], isLoading } = useNotebooks();
   const createNotebook = useCreateNotebook();
+  const updateNotebook = useUpdateNotebook();
   const deleteNotebook = useDeleteNotebook();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { search, setSearch } = useFilters();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [toEdit, setToEdit] = useState<Notebook | null>(null);
   const [toDelete, setToDelete] = useState<Notebook | null>(null);
 
   const { data: profile } = useQuery({
@@ -68,6 +70,17 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
       const nb = await createNotebook.mutateAsync(data);
       setDialogOpen(false);
       navigate({ to: "/notebook/$id", params: { id: nb.id } });
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  const handleEditSubmit = async (data: { name: string; color: string; icon_name: string }) => {
+    if (!toEdit) return;
+    try {
+      await updateNotebook.mutateAsync({ id: toEdit.id, ...data });
+      toast.success("Caderno atualizado");
+      setToEdit(null);
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -138,7 +151,7 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
                   to="/notebook/$id"
                   params={{ id: nb.id }}
                   onClick={onNavigate}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 pr-9 text-sm transition-colors ${
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 pr-16 text-sm transition-colors ${
                     active
                       ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                       : "text-sidebar-foreground hover:bg-sidebar-accent/60"
@@ -157,18 +170,34 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
                   })()}
                   <span className="truncate">{nb.name}</span>
                 </Link>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setToDelete(nb);
-                  }}
-                  className="absolute right-1.5 top-1/2 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:flex group-hover:opacity-100"
-                  aria-label={`Excluir caderno ${nb.name}`}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                <div className="absolute right-1 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 opacity-0 transition group-hover:flex group-hover:opacity-100">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setToEdit(nb);
+                    }}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                    aria-label={`Editar caderno ${nb.name}`}
+                    title="Editar caderno"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setToDelete(nb);
+                    }}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+                    aria-label={`Excluir caderno ${nb.name}`}
+                    title="Excluir caderno"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
               </div>
             );
           })
@@ -209,6 +238,19 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
         onOpenChange={setDialogOpen}
         onCreate={handleCreate}
         isSubmitting={createNotebook.isPending}
+      />
+
+      <CreateNotebookDialog
+        open={!!toEdit}
+        onOpenChange={(o) => !o && setToEdit(null)}
+        onCreate={handleEditSubmit}
+        isSubmitting={updateNotebook.isPending}
+        mode="edit"
+        initial={
+          toEdit
+            ? { name: toEdit.name, color: toEdit.color, icon_name: toEdit.icon_name }
+            : undefined
+        }
       />
 
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>

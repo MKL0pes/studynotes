@@ -23,7 +23,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import Image from "@tiptap/extension-image";
+import { ResizableImage } from "@/components/editor/image-node";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import { AdvancedCodeBlockView } from "@/components/editor/code-block-view";
@@ -220,7 +220,7 @@ function ToolbarButton({
   );
 }
 
-function Toolbar({ editor, noteId, userId }: { editor: Editor | null; noteId?: string; userId?: string }) {
+function Toolbar({ editor, noteId, userId, onAfterInsert }: { editor: Editor | null; noteId?: string; userId?: string; onAfterInsert?: () => void }) {
   if (!editor) return null;
   const sep = <div className="mx-1 h-5 w-px bg-border" />;
   return (
@@ -280,7 +280,10 @@ function Toolbar({ editor, noteId, userId }: { editor: Editor | null; noteId?: s
       <ToolbarButton
         title="Bloco de código"
         active={editor.isActive("codeBlock")}
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        onClick={() => {
+          editor.chain().focus().toggleCodeBlock().run();
+          onAfterInsert?.();
+        }}
       >
         <Code2 className="h-4 w-4" />
       </ToolbarButton>
@@ -326,7 +329,7 @@ function Toolbar({ editor, noteId, userId }: { editor: Editor | null; noteId?: s
       {sep}
       <ToolbarButton
         title="Inserir quiz"
-        onClick={() =>
+        onClick={() => {
           editor
             .chain()
             .focus()
@@ -334,24 +337,26 @@ function Toolbar({ editor, noteId, userId }: { editor: Editor | null; noteId?: s
               type: "quiz",
               attrs: { question: "", type: "multiple", options: ["", "", "", ""], correct: null, chosen: null },
             })
-            .run()
-        }
+            .run();
+          onAfterInsert?.();
+        }}
       >
         <HelpCircle className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
         title="Lista de tarefas"
-        onClick={() =>
+        onClick={() => {
           editor
             .chain()
             .focus()
             .insertContent({ type: "taskBlock", attrs: { items: [] } })
-            .run()
-        }
+            .run();
+          onAfterInsert?.();
+        }}
       >
         <ListChecks className="h-4 w-4" />
       </ToolbarButton>
-      {noteId && <UploadButton editor={editor} noteId={noteId} userId={userId} />}
+      {noteId && <UploadButton editor={editor} noteId={noteId} userId={userId} onAfterInsert={onAfterInsert} />}
     </div>
   );
 }
@@ -389,13 +394,27 @@ export function NoteEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       Underline,
-      Image.configure({ inline: false, allowBase64: false }),
+      ResizableImage.configure({ inline: false, allowBase64: false }),
       FileAttachment,
       Quiz,
       TaskBlock,
       CodeBlockLowlight.extend({
         addNodeView() {
           return ReactNodeViewRenderer(AdvancedCodeBlockView);
+        },
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            height: {
+              default: null,
+              parseHTML: (el) => {
+                const v = (el as HTMLElement).getAttribute("data-height");
+                return v ? parseInt(v, 10) : null;
+              },
+              renderHTML: (attrs: { height?: number | null }) =>
+                attrs.height ? { "data-height": String(attrs.height) } : {},
+            },
+          };
         },
         addKeyboardShortcuts() {
           return {
@@ -523,6 +542,14 @@ export function NoteEditor({
     }, 800);
     return () => clearTimeout(t);
   }, [title, tags, note?.id, editor]);
+
+  // Force-save immediately (used right after inserting special blocks).
+  const flushSave = () => {
+    if (!note || !editor) return;
+    const content = editor.getHTML();
+    update.mutate({ id: note.id, title, content, tags });
+    lastSavedRef.current = { title, content, tags };
+  };
 
   // Trigger save also on editor updates
   const [, forceTick] = useState(0);
@@ -726,7 +753,7 @@ export function NoteEditor({
         </div>
       </div>
 
-      <Toolbar editor={editor} noteId={note.id} userId={user?.id} />
+      <Toolbar editor={editor} noteId={note.id} userId={user?.id} onAfterInsert={flushSave} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-6 py-8 md:px-10 md:py-10">

@@ -1,8 +1,11 @@
 import { NodeViewContent, NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { Check, ChevronDown, Copy, Search } from "lucide-react";
+import { Check, ChevronDown, Copy, GripHorizontal, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SUPPORTED_LANGUAGES, colorForLang, labelForLang } from "@/lib/lowlight-instance";
+
+const MIN_HEIGHT = 80;
+const MAX_HEIGHT = 800;
 
 export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeViewProps) {
   const [copied, setCopied] = useState(false);
@@ -10,7 +13,26 @@ export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeVi
   const [query, setQuery] = useState("");
   const wrapperRef = useRef<HTMLDivElement>(null);
   const language = (node.attrs.language as string) || "plaintext";
+  const height = (node.attrs.height as number | null) ?? null;
   const accent = colorForLang(language);
+
+  const startResize = (e: React.MouseEvent) => {
+    if (!editor.isEditable) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const startY = e.clientY;
+    const startH = height ?? 200;
+    const onMove = (ev: MouseEvent) => {
+      const next = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, startH + (ev.clientY - startY)));
+      updateAttributes({ height: Math.round(next) });
+    };
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -119,7 +141,10 @@ export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeVi
         </button>
       </div>
 
-      <div className="code-block-body relative flex bg-[#1e1e2e]">
+      <div
+        className="code-block-body relative flex overflow-auto bg-[#1e1e2e]"
+        style={height ? { height: `${height}px` } : undefined}
+      >
         <div
           aria-hidden
           contentEditable={false}
@@ -136,6 +161,14 @@ export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeVi
             className={`hljs language-${language}`}
           />
         </pre>
+      </div>
+      <div
+        contentEditable={false}
+        onMouseDown={startResize}
+        title="Arraste para redimensionar"
+        className="group flex h-2.5 cursor-ns-resize items-center justify-center bg-[#181825] hover:bg-[#313244]"
+      >
+        <GripHorizontal className="h-3 w-3 text-[#6c7086] group-hover:text-[#cdd6f4]" />
       </div>
     </NodeViewWrapper>
   );
