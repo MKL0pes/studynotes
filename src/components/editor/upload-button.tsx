@@ -11,10 +11,12 @@ export function UploadButton({
   editor,
   noteId,
   userId,
+  onAfterInsert,
 }: {
   editor: Editor | null;
   noteId: string;
   userId?: string;
+  onAfterInsert?: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
