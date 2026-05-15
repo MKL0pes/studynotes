@@ -48,7 +48,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useUpdateNote, useDeleteNote } from "@/lib/queries";
 import { useAuth } from "@/hooks/use-auth";
-import { ListChecks, HelpCircle } from "lucide-react";
+import { ListChecks, HelpCircle, UserPlus } from "lucide-react";
+import { ShareNoteDialog } from "@/components/editor/share-dialog";
 import { toast } from "sonner";
 
 // Custom FontSize mark — extends TextStyle to add a fontSize attribute
