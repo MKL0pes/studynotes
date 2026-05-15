@@ -38,6 +38,9 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [toEdit, setToEdit] = useState<Notebook | null>(null);
   const [toDelete, setToDelete] = useState<Notebook | null>(null);
+  const { data: incomingShares = [] } = useIncomingShares(user?.email ?? undefined);
+  const { data: sharedNotes = [] } = useSharedNotes(user?.email ?? undefined);
+  const pendingCount = incomingShares.filter((s) => !s.accepted).length;
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
