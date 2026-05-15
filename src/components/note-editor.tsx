@@ -753,7 +753,7 @@ export function NoteEditor({
         </div>
       </div>
 
-      <Toolbar editor={editor} noteId={note.id} userId={user?.id} />
+      <Toolbar editor={editor} noteId={note.id} userId={user?.id} onAfterInsert={flushSave} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-6 py-8 md:px-10 md:py-10">
