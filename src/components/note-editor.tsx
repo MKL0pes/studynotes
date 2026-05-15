@@ -389,7 +389,7 @@ export function NoteEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       Underline,
-      Image.configure({ inline: false, allowBase64: false }),
+      ResizableImage.configure({ inline: false, allowBase64: false }),
       FileAttachment,
       Quiz,
       TaskBlock,
