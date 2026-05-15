@@ -359,9 +359,13 @@ export function NoteEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       Underline,
+      Image.configure({ inline: false, allowBase64: false }),
+      FileAttachment,
+      Quiz,
+      TaskBlock,
       CodeBlockLowlight.extend({
         addNodeView() {
-          return ReactNodeViewRenderer(CodeBlockView);
+          return ReactNodeViewRenderer(AdvancedCodeBlockView);
         },
         addKeyboardShortcuts() {
           return {
@@ -370,6 +374,37 @@ export function NoteEditor({
               if (!this.editor.isActive("codeBlock")) return false;
               this.editor.chain().focus().insertContent("  ").run();
               return true;
+            },
+            Enter: () => {
+              const ed = this.editor;
+              if (!ed.isActive("codeBlock")) return false;
+              const { state } = ed;
+              const { $from } = state.selection;
+              const lineStart = $from.start();
+              const before = state.doc.textBetween(lineStart, $from.pos, "\n", "\n");
+              const lastLine = before.split("\n").pop() || "";
+              const indentMatch = lastLine.match(/^(\s+)/);
+              const indent = indentMatch ? indentMatch[1] : "";
+              const trimmed = lastLine.trim();
+              const opens = /[{[(]\s*$/.test(trimmed);
+              const extra = opens ? "  " : "";
+              ed.chain().focus().insertContent("\n" + indent + extra).run();
+              return true;
+            },
+            "Shift-Tab": () => {
+              const ed = this.editor;
+              if (!ed.isActive("codeBlock")) return false;
+              const { state } = ed;
+              const { $from } = state.selection;
+              const lineStart = $from.start();
+              const before = state.doc.textBetween(lineStart, $from.pos, "\n", "\n");
+              const lastLine = before.split("\n").pop() || "";
+              if (lastLine.startsWith("  ")) {
+                const from = $from.pos - lastLine.length;
+                ed.chain().focus().setTextSelection({ from, to: from + 2 }).deleteSelection().run();
+                return true;
+              }
+              return false;
             },
           };
         },
@@ -382,9 +417,29 @@ export function NoteEditor({
     editorProps: {
       attributes: { class: "tiptap" },
       transformPastedHTML: (html) => html,
+      handleKeyDown: (_view, event) => {
+        // Auto-dedent on closing brace/bracket/paren in code block
+        if (!editorRef.current?.isActive("codeBlock")) return false;
+        if (!["}", "]", ")"].includes(event.key)) return false;
+        const ed = editorRef.current;
+        const { state } = ed;
+        const { $from } = state.selection;
+        const lineStart = $from.start();
+        const before = state.doc.textBetween(lineStart, $from.pos, "\n", "\n");
+        const lastLine = before.split("\n").pop() || "";
+        if (/^\s+$/.test(lastLine) && lastLine.length >= 2) {
+          const from = $from.pos - 2;
+          ed.chain().focus().setTextSelection({ from, to: from + 2 }).deleteSelection().run();
+        }
+        return false;
+      },
     },
     immediatelyRender: false,
   });
+  const editorRef = useRef<Editor | null>(null);
+  useEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
 
   // Decorate <pre> with data-language for the corner label
   useEffect(() => {
