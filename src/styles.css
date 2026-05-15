@@ -125,6 +125,7 @@
   line-height: 1.7;
   color: var(--color-foreground);
 }
+.tiptap::after { content: ""; display: block; clear: both; }
 .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   color: var(--color-muted-foreground);
