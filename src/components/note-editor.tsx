@@ -366,6 +366,7 @@ export function NoteEditor({
   const update = useUpdateNote();
   const del = useDeleteNote();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
