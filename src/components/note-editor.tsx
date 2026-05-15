@@ -329,7 +329,7 @@ function Toolbar({ editor, noteId, userId, onAfterInsert }: { editor: Editor | n
       {sep}
       <ToolbarButton
         title="Inserir quiz"
-        onClick={() =>
+        onClick={() => {
           editor
             .chain()
             .focus()
@@ -337,24 +337,26 @@ function Toolbar({ editor, noteId, userId, onAfterInsert }: { editor: Editor | n
               type: "quiz",
               attrs: { question: "", type: "multiple", options: ["", "", "", ""], correct: null, chosen: null },
             })
-            .run()
-        }
+            .run();
+          onAfterInsert?.();
+        }}
       >
         <HelpCircle className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
         title="Lista de tarefas"
-        onClick={() =>
+        onClick={() => {
           editor
             .chain()
             .focus()
             .insertContent({ type: "taskBlock", attrs: { items: [] } })
-            .run()
-        }
+            .run();
+          onAfterInsert?.();
+        }}
       >
         <ListChecks className="h-4 w-4" />
       </ToolbarButton>
-      {noteId && <UploadButton editor={editor} noteId={noteId} userId={userId} />}
+      {noteId && <UploadButton editor={editor} noteId={noteId} userId={userId} onAfterInsert={onAfterInsert} />}
     </div>
   );
 }
