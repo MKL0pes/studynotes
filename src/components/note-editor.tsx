@@ -323,6 +323,35 @@ function Toolbar({ editor, noteId, userId }: { editor: Editor | null; noteId?: s
       >
         <X className="h-3.5 w-3.5" />
       </ToolbarButton>
+      {sep}
+      <ToolbarButton
+        title="Inserir quiz"
+        onClick={() =>
+          editor
+            .chain()
+            .focus()
+            .insertContent({
+              type: "quiz",
+              attrs: { question: "", type: "multiple", options: ["", "", "", ""], correct: null, chosen: null },
+            })
+            .run()
+        }
+      >
+        <HelpCircle className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Lista de tarefas"
+        onClick={() =>
+          editor
+            .chain()
+            .focus()
+            .insertContent({ type: "taskBlock", attrs: { items: [] } })
+            .run()
+        }
+      >
+        <ListChecks className="h-4 w-4" />
+      </ToolbarButton>
+      {noteId && <UploadButton editor={editor} noteId={noteId} userId={userId} />}
     </div>
   );
 }
