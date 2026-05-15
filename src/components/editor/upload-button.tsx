@@ -44,7 +44,7 @@ export function UploadButton({
             .createSignedUrl(path, 60 * 60 * 24 * 7);
           const url = data?.signedUrl;
           if (url) {
-            editor.chain().focus().setImage({ src: url, alt: file.name }).run();
+            (editor.chain().focus() as any).setImage({ src: url, alt: file.name }).run();
           }
         } else {
           editor
