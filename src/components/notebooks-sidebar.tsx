@@ -240,6 +240,19 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
         isSubmitting={createNotebook.isPending}
       />
 
+      <CreateNotebookDialog
+        open={!!toEdit}
+        onOpenChange={(o) => !o && setToEdit(null)}
+        onCreate={handleEditSubmit}
+        isSubmitting={updateNotebook.isPending}
+        mode="edit"
+        initial={
+          toEdit
+            ? { name: toEdit.name, color: toEdit.color, icon_name: toEdit.icon_name }
+            : undefined
+        }
+      />
+
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
