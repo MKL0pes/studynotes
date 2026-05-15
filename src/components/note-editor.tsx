@@ -397,6 +397,20 @@ export function NoteEditor({
         addNodeView() {
           return ReactNodeViewRenderer(AdvancedCodeBlockView);
         },
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            height: {
+              default: null,
+              parseHTML: (el) => {
+                const v = (el as HTMLElement).getAttribute("data-height");
+                return v ? parseInt(v, 10) : null;
+              },
+              renderHTML: (attrs: { height?: number | null }) =>
+                attrs.height ? { "data-height": String(attrs.height) } : {},
+            },
+          };
+        },
         addKeyboardShortcuts() {
           return {
             ...this.parent?.(),
