@@ -731,19 +731,21 @@ export function NoteEditor({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={toggleArchive}>
-                {note.is_archived ? (
-                  <>
-                    <ArchiveRestore className="mr-2 h-4 w-4" />
-                    Desarquivar nota
-                  </>
-                ) : (
-                  <>
-                    <Archive className="mr-2 h-4 w-4" />
-                    Arquivar nota
-                  </>
-                )}
-              </DropdownMenuItem>
+              {!readOnly && (
+                <DropdownMenuItem onClick={toggleArchive}>
+                  {note.is_archived ? (
+                    <>
+                      <ArchiveRestore className="mr-2 h-4 w-4" />
+                      Desarquivar nota
+                    </>
+                  ) : (
+                    <>
+                      <Archive className="mr-2 h-4 w-4" />
+                      Arquivar nota
+                    </>
+                  )}
+                </DropdownMenuItem>
+              )}
               {!readOnly && (
                 <DropdownMenuItem onClick={() => setShareOpen(true)}>
                   <UserPlus className="mr-2 h-4 w-4" />
