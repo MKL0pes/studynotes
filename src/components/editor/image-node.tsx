@@ -60,10 +60,10 @@ function ResizableImageView({ node, updateAttributes, selected, deleteNode, edit
     "absolute z-10 h-3 w-3 rounded-sm border border-primary bg-background shadow";
 
   return (
-    <NodeViewWrapper as="span" className="inline-block w-full">
+    <NodeViewWrapper className={wrapperClass}>
       <figure
         ref={wrapperRef}
-        className={`relative max-w-full ${wrapperClass} ${selected ? "outline outline-2 outline-primary/60" : ""}`}
+        className={`relative max-w-full ${selected ? "outline outline-2 outline-primary/60" : ""}`}
         style={{ width: width ? `${width}px` : "auto" }}
       >
         <img
