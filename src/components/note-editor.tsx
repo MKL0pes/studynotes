@@ -23,13 +23,18 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import Image from "@tiptap/extension-image";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { CodeBlockView } from "@/components/code-block-view";
+import { AdvancedCodeBlockView } from "@/components/editor/code-block-view";
+import { FileAttachment } from "@/components/editor/file-attachment-node";
+import { Quiz } from "@/components/editor/quiz-node";
+import { TaskBlock } from "@/components/editor/task-block-node";
+import { UploadButton } from "@/components/editor/upload-button";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { Color } from "@tiptap/extension-color";
-import { createLowlight, common } from "lowlight";
+import { lowlight } from "@/lib/lowlight-instance";
 import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
@@ -42,9 +47,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUpdateNote, useDeleteNote } from "@/lib/queries";
+import { useAuth } from "@/hooks/use-auth";
+import { ListChecks, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
-
-const lowlight = createLowlight(common);
 
 // Custom FontSize mark — extends TextStyle to add a fontSize attribute
 const FontSize = TextStyle.extend({
@@ -215,7 +220,7 @@ function ToolbarButton({
   );
 }
 
-function Toolbar({ editor }: { editor: Editor | null }) {
+function Toolbar({ editor, noteId, userId }: { editor: Editor | null; noteId?: string; userId?: string }) {
   if (!editor) return null;
   const sep = <div className="mx-1 h-5 w-px bg-border" />;
   return (
@@ -318,6 +323,35 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       >
         <X className="h-3.5 w-3.5" />
       </ToolbarButton>
+      {sep}
+      <ToolbarButton
+        title="Inserir quiz"
+        onClick={() =>
+          editor
+            .chain()
+            .focus()
+            .insertContent({
+              type: "quiz",
+              attrs: { question: "", type: "multiple", options: ["", "", "", ""], correct: null, chosen: null },
+            })
+            .run()
+        }
+      >
+        <HelpCircle className="h-4 w-4" />
+      </ToolbarButton>
+      <ToolbarButton
+        title="Lista de tarefas"
+        onClick={() =>
+          editor
+            .chain()
+            .focus()
+            .insertContent({ type: "taskBlock", attrs: { items: [] } })
+            .run()
+        }
+      >
+        <ListChecks className="h-4 w-4" />
+      </ToolbarButton>
+      {noteId && <UploadButton editor={editor} noteId={noteId} userId={userId} />}
     </div>
   );
 }
@@ -332,6 +366,7 @@ export function NoteEditor({
   const update = useUpdateNote();
   const del = useDeleteNote();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
@@ -354,9 +389,13 @@ export function NoteEditor({
     extensions: [
       StarterKit.configure({ codeBlock: false }),
       Underline,
+      Image.configure({ inline: false, allowBase64: false }),
+      FileAttachment,
+      Quiz,
+      TaskBlock,
       CodeBlockLowlight.extend({
         addNodeView() {
-          return ReactNodeViewRenderer(CodeBlockView);
+          return ReactNodeViewRenderer(AdvancedCodeBlockView);
         },
         addKeyboardShortcuts() {
           return {
@@ -365,6 +404,37 @@ export function NoteEditor({
               if (!this.editor.isActive("codeBlock")) return false;
               this.editor.chain().focus().insertContent("  ").run();
               return true;
+            },
+            Enter: () => {
+              const ed = this.editor;
+              if (!ed.isActive("codeBlock")) return false;
+              const { state } = ed;
+              const { $from } = state.selection;
+              const lineStart = $from.start();
+              const before = state.doc.textBetween(lineStart, $from.pos, "\n", "\n");
+              const lastLine = before.split("\n").pop() || "";
+              const indentMatch = lastLine.match(/^(\s+)/);
+              const indent = indentMatch ? indentMatch[1] : "";
+              const trimmed = lastLine.trim();
+              const opens = /[{[(]\s*$/.test(trimmed);
+              const extra = opens ? "  " : "";
+              ed.chain().focus().insertContent("\n" + indent + extra).run();
+              return true;
+            },
+            "Shift-Tab": () => {
+              const ed = this.editor;
+              if (!ed.isActive("codeBlock")) return false;
+              const { state } = ed;
+              const { $from } = state.selection;
+              const lineStart = $from.start();
+              const before = state.doc.textBetween(lineStart, $from.pos, "\n", "\n");
+              const lastLine = before.split("\n").pop() || "";
+              if (lastLine.startsWith("  ")) {
+                const from = $from.pos - lastLine.length;
+                ed.chain().focus().setTextSelection({ from, to: from + 2 }).deleteSelection().run();
+                return true;
+              }
+              return false;
             },
           };
         },
@@ -377,9 +447,29 @@ export function NoteEditor({
     editorProps: {
       attributes: { class: "tiptap" },
       transformPastedHTML: (html) => html,
+      handleKeyDown: (_view, event) => {
+        // Auto-dedent on closing brace/bracket/paren in code block
+        if (!editorRef.current?.isActive("codeBlock")) return false;
+        if (!["}", "]", ")"].includes(event.key)) return false;
+        const ed = editorRef.current;
+        const { state } = ed;
+        const { $from } = state.selection;
+        const lineStart = $from.start();
+        const before = state.doc.textBetween(lineStart, $from.pos, "\n", "\n");
+        const lastLine = before.split("\n").pop() || "";
+        if (/^\s+$/.test(lastLine) && lastLine.length >= 2) {
+          const from = $from.pos - 2;
+          ed.chain().focus().setTextSelection({ from, to: from + 2 }).deleteSelection().run();
+        }
+        return false;
+      },
     },
     immediatelyRender: false,
   });
+  const editorRef = useRef<Editor | null>(null);
+  useEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
 
   // Decorate <pre> with data-language for the corner label
   useEffect(() => {
@@ -636,7 +726,7 @@ export function NoteEditor({
         </div>
       </div>
 
-      <Toolbar editor={editor} />
+      <Toolbar editor={editor} noteId={note.id} userId={user?.id} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-6 py-8 md:px-10 md:py-10">
