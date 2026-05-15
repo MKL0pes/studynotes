@@ -744,10 +744,17 @@ export function NoteEditor({
                   </>
                 )}
               </DropdownMenuItem>
+              {!readOnly && (
+                <DropdownMenuItem onClick={() => setShareOpen(true)}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Compartilhar nota
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleDelete}
                 className="text-destructive focus:text-destructive"
+                disabled={readOnly}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Excluir nota
@@ -757,7 +764,9 @@ export function NoteEditor({
         </div>
       </div>
 
-      <Toolbar editor={editor} noteId={note.id} userId={user?.id} onAfterInsert={flushSave} />
+      {!readOnly && (
+        <Toolbar editor={editor} noteId={note.id} userId={user?.id} onAfterInsert={flushSave} />
+      )}
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-6 py-8 md:px-10 md:py-10">
