@@ -532,9 +532,9 @@ export function NoteEditor({
     };
   }, [note?.id, editor]);
 
-  // Debounced autosave
+  // Debounced autosave (skipped in readOnly mode)
   useEffect(() => {
-    if (!note || !editor) return;
+    if (!note || !editor || readOnly) return;
     const t = setTimeout(() => {
       const content = editor.getHTML();
       const last = lastSavedRef.current;
@@ -546,7 +546,7 @@ export function NoteEditor({
       }
     }, 800);
     return () => clearTimeout(t);
-  }, [title, tags, note?.id, editor]);
+  }, [title, tags, note?.id, editor, readOnly]);
 
   // Force-save immediately (used right after inserting special blocks).
   const flushSave = () => {
