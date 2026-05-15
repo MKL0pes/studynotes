@@ -23,7 +23,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import Image from "@tiptap/extension-image";
+import { ResizableImage } from "@/components/editor/image-node";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import { AdvancedCodeBlockView } from "@/components/editor/code-block-view";
