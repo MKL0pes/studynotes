@@ -65,6 +65,7 @@ export function UploadButton({
         }
       }
       toast.success("Arquivo(s) enviado(s)");
+      onAfterInsert?.();
     } finally {
       setBusy(false);
       if (inputRef.current) inputRef.current.value = "";
