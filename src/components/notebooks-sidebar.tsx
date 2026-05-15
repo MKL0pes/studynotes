@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
+import { BookOpen, Pencil, Plus, Search, Settings, Moon, Sun, LogOut, X, Trash2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { useNotebooks, useCreateNotebook, useDeleteNotebook } from "@/lib/queries";
+import { useNotebooks, useCreateNotebook, useDeleteNotebook, useUpdateNotebook } from "@/lib/queries";
 import { getNotebookIcon } from "@/lib/notebook-icons";
 import type { Notebook } from "@/lib/db-types";
 import { supabase } from "@/integrations/supabase/client";
