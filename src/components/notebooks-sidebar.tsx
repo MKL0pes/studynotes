@@ -63,7 +63,7 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
     }
   };
 
-  const handleCreate = async (data: { name: string; color: string }) => {
+  const handleCreate = async (data: { name: string; color: string; icon_name: string }) => {
     try {
       const nb = await createNotebook.mutateAsync(data);
       setDialogOpen(false);
