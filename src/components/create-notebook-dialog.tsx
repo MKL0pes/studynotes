@@ -197,7 +197,9 @@ export function CreateNotebookDialog({
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting || !name.trim()}>
-              {isSubmitting ? "Criando..." : "Criar caderno"}
+              {isSubmitting
+                ? mode === "edit" ? "Salvando..." : "Criando..."
+                : mode === "edit" ? "Salvar alterações" : "Criar caderno"}
             </Button>
           </DialogFooter>
         </form>
