@@ -280,7 +280,10 @@ function Toolbar({ editor, noteId, userId, onAfterInsert }: { editor: Editor | n
       <ToolbarButton
         title="Bloco de código"
         active={editor.isActive("codeBlock")}
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        onClick={() => {
+          editor.chain().focus().toggleCodeBlock().run();
+          onAfterInsert?.();
+        }}
       >
         <Code2 className="h-4 w-4" />
       </ToolbarButton>
