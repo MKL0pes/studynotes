@@ -220,7 +220,7 @@ function ToolbarButton({
   );
 }
 
-function Toolbar({ editor, noteId, userId }: { editor: Editor | null; noteId?: string; userId?: string }) {
+function Toolbar({ editor, noteId, userId, onAfterInsert }: { editor: Editor | null; noteId?: string; userId?: string; onAfterInsert?: () => void }) {
   if (!editor) return null;
   const sep = <div className="mx-1 h-5 w-px bg-border" />;
   return (
