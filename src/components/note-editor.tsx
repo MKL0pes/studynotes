@@ -23,13 +23,18 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import Image from "@tiptap/extension-image";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { CodeBlockView } from "@/components/code-block-view";
+import { AdvancedCodeBlockView } from "@/components/editor/code-block-view";
+import { FileAttachment } from "@/components/editor/file-attachment-node";
+import { Quiz } from "@/components/editor/quiz-node";
+import { TaskBlock } from "@/components/editor/task-block-node";
+import { UploadButton } from "@/components/editor/upload-button";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { Color } from "@tiptap/extension-color";
-import { createLowlight, common } from "lowlight";
+import { lowlight } from "@/lib/lowlight-instance";
 import type { Note } from "@/lib/db-types";
 import { formatRelative } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
@@ -42,9 +47,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUpdateNote, useDeleteNote } from "@/lib/queries";
+import { useAuth } from "@/hooks/use-auth";
+import { ListChecks, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
-
-const lowlight = createLowlight(common);
 
 // Custom FontSize mark — extends TextStyle to add a fontSize attribute
 const FontSize = TextStyle.extend({
