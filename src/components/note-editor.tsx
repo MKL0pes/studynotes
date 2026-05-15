@@ -701,17 +701,19 @@ export function NoteEditor({
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={toggleFavorite}
-            title={note.is_favorite ? "Remover dos favoritos" : "Favoritar"}
-          >
-            <Star
-              className={`h-4 w-4 ${note.is_favorite ? "fill-primary text-primary" : ""}`}
-            />
-          </Button>
+          {!readOnly && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={toggleFavorite}
+              title={note.is_favorite ? "Remover dos favoritos" : "Favoritar"}
+            >
+              <Star
+                className={`h-4 w-4 ${note.is_favorite ? "fill-primary text-primary" : ""}`}
+              />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
