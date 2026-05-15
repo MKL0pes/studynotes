@@ -86,15 +86,17 @@ export function CreateNotebookDialog({
       open={open}
       onOpenChange={(v) => {
         onOpenChange(v);
-        if (!v) reset();
+        if (!v && mode === "create") reset();
       }}
     >
       <DialogContent className="sm:max-w-[480px]">
         <form onSubmit={handleSubmit} className="space-y-5">
           <DialogHeader>
-            <DialogTitle>Novo caderno</DialogTitle>
+            <DialogTitle>{mode === "edit" ? "Editar caderno" : "Novo caderno"}</DialogTitle>
             <DialogDescription>
-              Organize suas anotações por matéria ou projeto.
+              {mode === "edit"
+                ? "Atualize o nome, a cor ou o ícone do caderno."
+                : "Organize suas anotações por matéria ou projeto."}
             </DialogDescription>
           </DialogHeader>
 
