@@ -725,7 +725,7 @@ export function NoteEditor({
         </div>
       </div>
 
-      <Toolbar editor={editor} />
+      <Toolbar editor={editor} noteId={note.id} userId={user?.id} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl px-6 py-8 md:px-10 md:py-10">
