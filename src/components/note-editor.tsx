@@ -365,9 +365,11 @@ function Toolbar({ editor, noteId, userId, onAfterInsert }: { editor: Editor | n
 export function NoteEditor({
   note,
   backTo,
+  readOnly = false,
 }: {
   note?: Note;
-  backTo?: { to: "/notebook/$id"; params: { id: string } };
+  backTo?: { to: "/notebook/$id"; params: { id: string } } | { to: "/dashboard" };
+  readOnly?: boolean;
 }) {
   const update = useUpdateNote();
   const del = useDeleteNote();
@@ -376,7 +378,8 @@ export function NoteEditor({
   const [title, setTitle] = useState(note?.title ?? "");
   const [tags, setTags] = useState<string[]>(note?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
-  const [readingMode, setReadingMode] = useState(false);
+  const [readingMode, setReadingMode] = useState(readOnly);
+  const [shareOpen, setShareOpen] = useState(false);
   const lastSavedRef = useRef<{ title: string; content: string; tags: string[] }>({
     title: "",
     content: "",
