@@ -13,7 +13,26 @@ export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeVi
   const [query, setQuery] = useState("");
   const wrapperRef = useRef<HTMLDivElement>(null);
   const language = (node.attrs.language as string) || "plaintext";
+  const height = (node.attrs.height as number | null) ?? null;
   const accent = colorForLang(language);
+
+  const startResize = (e: React.MouseEvent) => {
+    if (!editor.isEditable) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const startY = e.clientY;
+    const startH = height ?? 200;
+    const onMove = (ev: MouseEvent) => {
+      const next = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, startH + (ev.clientY - startY)));
+      updateAttributes({ height: Math.round(next) });
+    };
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
