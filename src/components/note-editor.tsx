@@ -538,6 +538,14 @@ export function NoteEditor({
     return () => clearTimeout(t);
   }, [title, tags, note?.id, editor]);
 
+  // Force-save immediately (used right after inserting special blocks).
+  const flushSave = () => {
+    if (!note || !editor) return;
+    const content = editor.getHTML();
+    update.mutate({ id: note.id, title, content, tags });
+    lastSavedRef.current = { title, content, tags };
+  };
+
   // Trigger save also on editor updates
   const [, forceTick] = useState(0);
   useEffect(() => {
