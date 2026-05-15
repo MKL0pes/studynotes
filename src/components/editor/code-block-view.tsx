@@ -1,8 +1,11 @@
 import { NodeViewContent, NodeViewWrapper, type NodeViewProps } from "@tiptap/react";
-import { Check, ChevronDown, Copy, Search } from "lucide-react";
+import { Check, ChevronDown, Copy, GripHorizontal, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SUPPORTED_LANGUAGES, colorForLang, labelForLang } from "@/lib/lowlight-instance";
+
+const MIN_HEIGHT = 80;
+const MAX_HEIGHT = 800;
 
 export function AdvancedCodeBlockView({ node, updateAttributes, editor }: NodeViewProps) {
   const [copied, setCopied] = useState(false);
