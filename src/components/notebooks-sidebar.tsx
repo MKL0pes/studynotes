@@ -208,6 +208,45 @@ export function NotebooksSidebar({ onNavigate }: { onNavigate?: () => void }) {
         )}
       </nav>
 
+      <div className="mt-4 flex items-center justify-between px-5">
+        <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <Users className="h-3.5 w-3.5" />
+          Compartilhadas comigo
+        </span>
+        {pendingCount > 0 && (
+          <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">
+            {pendingCount}
+          </span>
+        )}
+      </div>
+      <nav className="mt-1 max-h-48 space-y-0.5 overflow-y-auto px-3 pb-2">
+        {sharedNotes.length === 0 ? (
+          <div className="px-3 py-2 text-xs text-muted-foreground">Nada compartilhado.</div>
+        ) : (
+          sharedNotes.map((n) => {
+            const active = path === `/shared/${n.id}`;
+            return (
+              <Link
+                key={n.id}
+                to="/shared/$id"
+                params={{ id: n.id }}
+                onClick={onNavigate}
+                className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                  active
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/60"
+                }`}
+              >
+                <span className="flex-1 truncate">{n.title || "Sem título"}</span>
+                <span className="shrink-0 text-[10px] uppercase text-muted-foreground">
+                  {n._permission === "edit" ? "Edit" : "Ver"}
+                </span>
+              </Link>
+            );
+          })
+        )}
+      </nav>
+
       <div className="border-t border-sidebar-border p-3">
         <div className="flex items-center justify-between">
           <Button variant="ghost" size="sm" className="gap-2" onClick={toggle}>
