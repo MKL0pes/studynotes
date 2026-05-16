@@ -31,11 +31,12 @@ export const useNote = (id: string) =>
   useQuery({
     queryKey: ["note", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("notes").select("*").eq("id", id).single();
+      const { data, error } = await supabase.from("notes").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
-      return data as Note;
+      return (data ?? null) as Note | null;
     },
     enabled: !!id,
+    retry: 1,
   });
 
 export const useCreateNotebook = () => {
