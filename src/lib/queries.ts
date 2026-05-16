@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Note, Notebook } from "./db-types";
 
@@ -31,11 +32,12 @@ export const useNote = (id: string) =>
   useQuery({
     queryKey: ["note", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("notes").select("*").eq("id", id).single();
+      const { data, error } = await supabase.from("notes").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
-      return data as Note;
+      return (data ?? null) as Note | null;
     },
     enabled: !!id,
+    retry: 1,
   });
 
 export const useCreateNotebook = () => {
@@ -137,6 +139,9 @@ export const useUpdateNote = () => {
       qc.invalidateQueries({ queryKey: ["note", note.id] });
       qc.invalidateQueries({ queryKey: ["notes", note.notebook_id] });
       qc.invalidateQueries({ queryKey: ["notes", "all"] });
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || "Não foi possível salvar a nota");
     },
   });
 };
