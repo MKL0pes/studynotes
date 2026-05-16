@@ -140,6 +140,9 @@ export const useUpdateNote = () => {
       qc.invalidateQueries({ queryKey: ["notes", note.notebook_id] });
       qc.invalidateQueries({ queryKey: ["notes", "all"] });
     },
+    onError: (err: Error) => {
+      toast.error(err.message || "Não foi possível salvar a nota");
+    },
   });
 };
 
