@@ -396,7 +396,7 @@ export function NoteEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ codeBlock: false }),
+      StarterKit.configure({ codeBlock: false, underline: false } as any),
       Underline,
       ResizableImage.configure({ inline: false, allowBase64: false }),
       FileAttachment,
