@@ -58,11 +58,11 @@ export function UploadButton({
         if (mode === "image" && file.type.startsWith("image/")) {
           const { data } = await supabase.storage
             .from("note-attachments")
-            .createSignedUrl(path, 60 * 60 * 24 * 7);
+            .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 year
           const url = data?.signedUrl;
           if (url) {
             (editor.chain().focus() as any)
-              .setImage({ src: url, alt: file.name })
+              .setImage({ src: url, alt: file.name, path })
               .run();
           }
         } else {

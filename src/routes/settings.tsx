@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Camera, LogOut, Moon, Sun, Trash2, User } from "lucide-react";
+import { ArrowLeft, Camera, HelpCircle, LogOut, Moon, Sun, Trash2, User } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -20,6 +20,39 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { deleteOwnAccount } from "@/lib/account.functions";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+const FAQ_ITEMS = [
+  {
+    q: "Minhas notas estão sincronizadas em todos os dispositivos?",
+    a: "Sim. Tudo é salvo automaticamente na nuvem em poucos segundos e fica disponível em qualquer dispositivo onde você fizer login.",
+  },
+  {
+    q: "Como funciona o compartilhamento de notas?",
+    a: "Use o ícone de compartilhar na nota, informe o e-mail da pessoa e escolha se ela pode apenas ver ou também editar. O destinatário verá a nota ao fazer login com aquele e-mail.",
+  },
+  {
+    q: "Posso usar imagens, código e quizzes nas notas?",
+    a: "Sim. O editor suporta imagens com redimensionamento, blocos de código com mais de 40 linguagens e destaque de sintaxe, quizzes interativos e checklists de tarefas.",
+  },
+  {
+    q: "Como ativo o modo escuro?",
+    a: "Use o botão na seção 'Aparência' acima para alternar entre claro e escuro. Sua preferência fica salva no navegador.",
+  },
+  {
+    q: "Minhas notas vão expirar ou ser apagadas?",
+    a: "Não. Suas notas ficam armazenadas indefinidamente enquanto sua conta existir. Imagens são recarregadas automaticamente para não expirarem.",
+  },
+  {
+    q: "Como excluo minha conta?",
+    a: "Use o botão 'Excluir conta' na seção Conta. A exclusão é permanente e remove todas as notas, cadernos e arquivos enviados.",
+  },
+];
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -275,7 +308,54 @@ function SettingsPage() {
             </div>
           </div>
         </section>
+
+        {/* FAQ */}
+        <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="mb-2 flex items-center gap-2">
+            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Perguntas frequentes
+            </h2>
+          </div>
+          <Accordion type="single" collapsible className="mt-2">
+            {FAQ_ITEMS.map((item, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="border-border">
+                <AccordionTrigger className="text-left text-sm font-medium hover:no-underline">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </section>
+
+        {/* Sobre o autor */}
+        <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Sobre o autor
+          </h2>
+          <div className="mt-4 flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <User className="h-6 w-6" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base font-semibold text-foreground">StudyNotes</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                Um app de anotações universitárias feito para estudantes que precisam de
+                organização sem fricção: cadernos, tags, blocos de código, quizzes,
+                checklists e compartilhamento — tudo em um único lugar, com sincronização
+                em nuvem e tema claro/escuro.
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Construído com TanStack Start, React, Tailwind CSS e Supabase.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
+
 
       {/* Sign out confirm */}
       <Dialog open={signOutOpen} onOpenChange={setSignOutOpen}>
