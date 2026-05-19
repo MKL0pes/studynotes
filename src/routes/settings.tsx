@@ -308,7 +308,54 @@ function SettingsPage() {
             </div>
           </div>
         </section>
+
+        {/* FAQ */}
+        <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="mb-2 flex items-center gap-2">
+            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Perguntas frequentes
+            </h2>
+          </div>
+          <Accordion type="single" collapsible className="mt-2">
+            {FAQ_ITEMS.map((item, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="border-border">
+                <AccordionTrigger className="text-left text-sm font-medium hover:no-underline">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </section>
+
+        {/* Sobre o autor */}
+        <section className="mt-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Sobre o autor
+          </h2>
+          <div className="mt-4 flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <User className="h-6 w-6" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base font-semibold text-foreground">StudyNotes</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                Um app de anotações universitárias feito para estudantes que precisam de
+                organização sem fricção: cadernos, tags, blocos de código, quizzes,
+                checklists e compartilhamento — tudo em um único lugar, com sincronização
+                em nuvem e tema claro/escuro.
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Construído com TanStack Start, React, Tailwind CSS e Supabase.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
+
 
       {/* Sign out confirm */}
       <Dialog open={signOutOpen} onOpenChange={setSignOutOpen}>
