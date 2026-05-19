@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Camera, LogOut, Moon, Sun, Trash2, User } from "lucide-react";
+import { ArrowLeft, Camera, HelpCircle, LogOut, Moon, Sun, Trash2, User } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -20,6 +20,39 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { deleteOwnAccount } from "@/lib/account.functions";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+const FAQ_ITEMS = [
+  {
+    q: "Minhas notas estão sincronizadas em todos os dispositivos?",
+    a: "Sim. Tudo é salvo automaticamente na nuvem em poucos segundos e fica disponível em qualquer dispositivo onde você fizer login.",
+  },
+  {
+    q: "Como funciona o compartilhamento de notas?",
+    a: "Use o ícone de compartilhar na nota, informe o e-mail da pessoa e escolha se ela pode apenas ver ou também editar. O destinatário verá a nota ao fazer login com aquele e-mail.",
+  },
+  {
+    q: "Posso usar imagens, código e quizzes nas notas?",
+    a: "Sim. O editor suporta imagens com redimensionamento, blocos de código com mais de 40 linguagens e destaque de sintaxe, quizzes interativos e checklists de tarefas.",
+  },
+  {
+    q: "Como ativo o modo escuro?",
+    a: "Use o botão na seção 'Aparência' acima para alternar entre claro e escuro. Sua preferência fica salva no navegador.",
+  },
+  {
+    q: "Minhas notas vão expirar ou ser apagadas?",
+    a: "Não. Suas notas ficam armazenadas indefinidamente enquanto sua conta existir. Imagens são recarregadas automaticamente para não expirarem.",
+  },
+  {
+    q: "Como excluo minha conta?",
+    a: "Use o botão 'Excluir conta' na seção Conta. A exclusão é permanente e remove todas as notas, cadernos e arquivos enviados.",
+  },
+];
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
