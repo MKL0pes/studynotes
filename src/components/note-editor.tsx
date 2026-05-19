@@ -50,6 +50,7 @@ import { useUpdateNote, useDeleteNote } from "@/lib/queries";
 import { useAuth } from "@/hooks/use-auth";
 import { ListChecks, HelpCircle, UserPlus } from "lucide-react";
 import { ShareNoteDialog } from "@/components/editor/share-dialog";
+import { stripHtml } from "@/lib/filters-context";
 import { toast } from "sonner";
 
 // Custom FontSize mark — extends TextStyle to add a fontSize attribute
@@ -579,7 +580,28 @@ export function NoteEditor({
     };
   });
 
-  // Notes are only deleted via explicit user action (handleDelete).
+  // Auto-delete on unmount if the note is still pristine (default title,
+  // empty content, no tags, not favorited) AND belongs to the current user.
+  // This prevents empty notes from accumulating when the user clicks "+"
+  // and then navigates away without typing anything.
+  useEffect(() => {
+    return () => {
+      const snap = currentRef.current;
+      if (!snap) return;
+      if (!user || note?.user_id !== user.id) return;
+      const titleEmpty = !snap.title.trim() || snap.title.trim() === "Nova nota";
+      const contentEmpty =
+        !snap.content ||
+        snap.content === "<p></p>" ||
+        stripHtml(snap.content).trim() === "";
+      const isPristine = titleEmpty && contentEmpty && snap.tags.length === 0 && !snap.is_favorite;
+      if (isPristine) {
+        del.mutate(snap.id);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [note?.id, user?.id]);
+
 
   const toggleFavorite = () => {
     if (!note) return;
