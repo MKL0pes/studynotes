@@ -12,15 +12,37 @@ type Align = "left" | "center" | "right";
 
 function ResizableImageView({ node, updateAttributes, selected, deleteNode, editor }: NodeViewProps) {
   const editable = editor.isEditable;
-  const src = node.attrs.src as string;
+  const initialSrc = node.attrs.src as string;
   const alt = (node.attrs.alt as string) || "";
   const width = node.attrs.width as number | null;
   const align = (node.attrs.align as Align) || "center";
   const caption = (node.attrs.caption as string) || "";
+  const path = (node.attrs.path as string) || "";
+  const [src, setSrc] = useState<string>(initialSrc);
 
   const [editingCaption, setEditingCaption] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Regenerate signed URL whenever the path attribute is present.
+  // This fixes images that previously expired after 7 days.
+  useEffect(() => {
+    if (!path) {
+      setSrc(initialSrc);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data } = await supabase.storage
+        .from("note-attachments")
+        .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 year
+      if (!cancelled && data?.signedUrl) setSrc(data.signedUrl);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [path, initialSrc]);
 
   const startResize = (
     e: React.MouseEvent,
@@ -195,6 +217,12 @@ export const ResizableImage = Image.extend({
         parseHTML: (el) => (el as HTMLElement).getAttribute("data-caption") || "",
         renderHTML: (attrs: { caption?: string }) =>
           attrs.caption ? { "data-caption": attrs.caption } : {},
+      },
+      path: {
+        default: "",
+        parseHTML: (el) => (el as HTMLElement).getAttribute("data-path") || "",
+        renderHTML: (attrs: { path?: string }) =>
+          attrs.path ? { "data-path": attrs.path } : {},
       },
     };
   },
