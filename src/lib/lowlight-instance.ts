@@ -1,5 +1,6 @@
 import { createLowlight, all } from "lowlight";
 import javascript from "highlight.js/lib/languages/javascript";
+import typescript from "highlight.js/lib/languages/typescript";
 import sql from "highlight.js/lib/languages/sql";
 
 export const lowlight = createLowlight(all);
@@ -8,14 +9,18 @@ export const lowlight = createLowlight(all);
 lowlight.register("mongodb", javascript);
 lowlight.register("postgresql", sql);
 lowlight.register("mysql", sql);
+// JSX/TSX get their own registered aliases so the code-block dropdown can
+// distinguish them from plain JavaScript/TypeScript instead of showing duplicates.
+lowlight.register("jsx", javascript);
+lowlight.register("tsx", typescript);
 
 export const SUPPORTED_LANGUAGES: { label: string; value: string; group: string }[] = [
   { label: "Plain text", value: "plaintext", group: "Outros" },
   // Web
   { label: "JavaScript", value: "javascript", group: "Web" },
   { label: "TypeScript", value: "typescript", group: "Web" },
-  { label: "JSX", value: "javascript", group: "Web" },
-  { label: "TSX", value: "typescript", group: "Web" },
+  { label: "JSX", value: "jsx", group: "Web" },
+  { label: "TSX", value: "tsx", group: "Web" },
   { label: "HTML", value: "xml", group: "Web" },
   { label: "CSS", value: "css", group: "Web" },
   { label: "SCSS", value: "scss", group: "Web" },
@@ -65,6 +70,8 @@ export const SUPPORTED_LANGUAGES: { label: string; value: string; group: string 
 const LANG_COLORS: Record<string, string> = {
   javascript: "#f7df1e",
   typescript: "#3178c6",
+  jsx: "#61dafb",
+  tsx: "#61dafb",
   python: "#3572A5",
   java: "#b07219",
   kotlin: "#A97BFF",
