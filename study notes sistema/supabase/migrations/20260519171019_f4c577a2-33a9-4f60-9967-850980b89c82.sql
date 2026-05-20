@@ -1,5 +1,0 @@
-DROP TRIGGER IF EXISTS shared_notes_protect_recipient_updates_trg ON public.shared_notes;
-CREATE TRIGGER shared_notes_protect_recipient_updates_trg
-BEFORE UPDATE ON public.shared_notes
-FOR EACH ROW
-EXECUTE FUNCTION public.shared_notes_protect_recipient_updates();
