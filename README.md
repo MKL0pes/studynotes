@@ -56,13 +56,7 @@ Responsável por todas as etapas: configuração da plataforma, integração com
 
 ---
 
-## Registro da Aula
-- **Data:** 12/05/2026  
-- **Atividade:** Discussão crítica + mini-projeto de aplicação  
-- **Local:** Laboratório de informática / Quadro branco  
-- **Professor(a):** Kadidja Valéria  
 
----
 
 ## Próximos Passos
 - Melhorar interface com dashboards interativos (Power BI).  
