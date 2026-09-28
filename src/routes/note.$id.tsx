@@ -10,7 +10,14 @@ import { notebookEmoji } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/note/$id")({
-  head: () => ({ meta: [{ title: "Nota — StudyNotes" }] }),
+  head: () => ({
+    meta: [
+      { title: "Nota — StudyNotes" },
+      { name: "description", content: "Leia e edite sua anotação com editor rico, código, imagens e quizzes." },
+      { property: "og:title", content: "Nota — StudyNotes" },
+      { property: "og:description", content: "Leia e edite sua anotação com editor rico, código, imagens e quizzes." },
+    ],
+  }),
   component: NotePage,
   errorComponent: NoteErrorComponent,
   notFoundComponent: NoteNotFound,

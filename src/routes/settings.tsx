@@ -59,6 +59,8 @@ export const Route = createFileRoute("/settings")({
     meta: [
       { title: "Configurações — StudyNotes" },
       { name: "description", content: "Gerencie seu perfil, aparência e conta." },
+      { property: "og:title", content: "Configurações — StudyNotes" },
+      { property: "og:description", content: "Gerencie seu perfil, aparência e conta no StudyNotes." },
     ],
   }),
   component: SettingsPage,

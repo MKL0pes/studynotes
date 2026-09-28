@@ -13,6 +13,8 @@ export const Route = createFileRoute("/login")({
     meta: [
       { title: "Entrar — StudyNotes" },
       { name: "description", content: "Acesse suas anotações universitárias no StudyNotes." },
+      { property: "og:title", content: "Entrar — StudyNotes" },
+      { property: "og:description", content: "Entre ou crie sua conta para organizar suas anotações universitárias." },
     ],
   }),
   component: LoginPage,

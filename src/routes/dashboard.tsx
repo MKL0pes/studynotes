@@ -11,6 +11,8 @@ export const Route = createFileRoute("/dashboard")({
     meta: [
       { title: "Dashboard — StudyNotes" },
       { name: "description", content: "Visão geral dos seus cadernos e anotações recentes." },
+      { property: "og:title", content: "Dashboard — StudyNotes" },
+      { property: "og:description", content: "Visão geral dos seus cadernos e anotações recentes." },
     ],
   }),
   component: Dashboard,
