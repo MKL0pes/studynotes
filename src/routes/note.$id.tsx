@@ -10,6 +10,7 @@ import { notebookEmoji } from "@/lib/db-types";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/note/$id")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Nota — StudyNotes" },

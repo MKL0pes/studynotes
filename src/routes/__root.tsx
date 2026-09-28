@@ -71,10 +71,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "mpf9Q_IVapIQSLxesaC3TVx0OXhvJVywjHmGHmDBHao" },
       { title: "StudyNotes — Suas anotações universitárias" },
       { name: "description", content: "Organize cadernos e anotações da faculdade em um só lugar." },
       { name: "author", content: "StudyNotes" },

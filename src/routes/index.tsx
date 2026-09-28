@@ -6,6 +6,7 @@ const DESC =
   "Organize suas anotações da faculdade em cadernos, com editor rico, blocos de código, quizzes, tags e compartilhamento.";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: TITLE },

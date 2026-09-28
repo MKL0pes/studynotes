@@ -55,6 +55,7 @@ const FAQ_ITEMS = [
 ];
 
 export const Route = createFileRoute("/settings")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Configurações — StudyNotes" },
