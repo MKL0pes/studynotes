@@ -9,7 +9,12 @@ import { notebookEmoji } from "@/lib/db-types";
 
 export const Route = createFileRoute("/notebook/$id")({
   head: () => ({
-    meta: [{ title: "Caderno — StudyNotes" }],
+    meta: [
+      { title: "Caderno — StudyNotes" },
+      { name: "description", content: "Todas as notas de um caderno organizadas por disciplina." },
+      { property: "og:title", content: "Caderno — StudyNotes" },
+      { property: "og:description", content: "Todas as notas de um caderno organizadas por disciplina." },
+    ],
   }),
   component: NotebookPage,
 });

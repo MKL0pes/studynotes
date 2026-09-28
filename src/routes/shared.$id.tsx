@@ -8,7 +8,14 @@ import { useIncomingShares, useAcceptShare } from "@/lib/shared-notes-queries";
 import { Users } from "lucide-react";
 
 export const Route = createFileRoute("/shared/$id")({
-  head: () => ({ meta: [{ title: "Compartilhada — StudyNotes" }] }),
+  head: () => ({
+    meta: [
+      { title: "Nota compartilhada — StudyNotes" },
+      { name: "description", content: "Acesse uma nota que um colega compartilhou com você no StudyNotes." },
+      { property: "og:title", content: "Nota compartilhada — StudyNotes" },
+      { property: "og:description", content: "Acesse uma nota que um colega compartilhou com você no StudyNotes." },
+    ],
+  }),
   component: SharedPage,
 });
 
@@ -35,10 +42,10 @@ function SharedPage() {
       middle={
         <div className="flex h-full flex-col bg-background">
           <div className="border-b border-border px-5 py-4">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h1 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               <Users className="h-3.5 w-3.5" />
               Compartilhadas comigo
-            </div>
+            </h1>
           </div>
           <div className="flex-1 overflow-y-auto p-3">
             {incoming.length === 0 ? (
