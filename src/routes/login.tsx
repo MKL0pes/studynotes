@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Entrar — StudyNotes" },

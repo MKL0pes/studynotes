@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { notebookEmoji } from "@/lib/db-types";
 
 export const Route = createFileRoute("/notebook/$id")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Caderno — StudyNotes" },

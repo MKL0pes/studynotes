@@ -8,6 +8,7 @@ import { useIncomingShares, useAcceptShare } from "@/lib/shared-notes-queries";
 import { Users } from "lucide-react";
 
 export const Route = createFileRoute("/shared/$id")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Nota compartilhada — StudyNotes" },

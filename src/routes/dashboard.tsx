@@ -7,6 +7,7 @@ import { useNotes, useNotebooks, useCreateNote } from "@/lib/queries";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/dashboard")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Dashboard — StudyNotes" },
